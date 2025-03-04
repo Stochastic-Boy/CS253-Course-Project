@@ -3,7 +3,7 @@ const Menu = () => {
   return (
     <div>
       <div>
-        <p>canteen ki maa ki chut</p>
+        <p>todays menu will be updated soon</p>
       </div>
     </div>
   )

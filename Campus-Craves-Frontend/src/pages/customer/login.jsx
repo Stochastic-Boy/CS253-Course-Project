@@ -3,7 +3,7 @@ const login = () => {
   return (
     <div>
       <div>
-        <p>canteen ki maa ki chut</p>
+        <p>Login here </p>
       </div>
     </div>
   )

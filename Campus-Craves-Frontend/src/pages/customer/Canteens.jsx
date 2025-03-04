@@ -3,7 +3,7 @@ const Canteens = () => {
   return (
     <div>
       <div >
-        <p>canteen ki maa ki chuut</p>
+        <p>canteens are closed now</p>
       </div>
     </div>
   )
