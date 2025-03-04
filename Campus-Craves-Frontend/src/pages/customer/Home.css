@@ -1,0 +1,33 @@
+.hero {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: black;
+}
+.hero-image {
+  width: 35vw;
+  display: block;
+  margin-left: auto;
+  margin-right: 10vw;
+}
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-182%, 100%);
+}
+.search-box {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  width: 20vw;
+  margin-left: 10vw;
+  margin-right: auto;
+}
+.food{
+  margin-top: 5vh;
+  margin-left: 2vw;
+  font-weight: 7000;
+}
