@@ -2,7 +2,7 @@
   display: flex;
   position: relative;
   width: 100%;
-  height: 40vh;
+  height: 400px;
   background-color: black;
   flex-wrap: wrap; /* Allows items to wrap on smaller screens */
 }
@@ -32,6 +32,13 @@
   margin-left: 21vw;
   margin-right: auto;
   min-width: 180px; /* Ensures usability on small screens */
+}
+
+.food {
+  margin-top: 5vh;
+  margin-left: 2vw;
+  font-weight: 7000;
+  font-size: clamp(16px, 2vw, 24px); /* Keeps font size responsive */
 }
 
 /* Responsive Adjustments */

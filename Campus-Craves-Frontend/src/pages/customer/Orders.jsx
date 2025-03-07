@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import "./OrderHistory.css";
+import "./Orders.css";
 
-const OrderHistory = () => {
+const Orders = () => {
   const navigate = useNavigate();
 
   const orders = [
@@ -16,17 +16,17 @@ const OrderHistory = () => {
       address: "E-214, Hall of Residence 1",
       payment: "Cash",
       status: "Preparing",
+      canteen: "Hall 5", // Added canteen information
     },
     {
       id: 2,
-      items: [
-        { name: "Pasta", quantity: 1, price: 250 },
-      ],
+      items: [{ name: "Pasta", quantity: 1, price: 250 }],
       total: 250,
       date: "Feb 10, 2022 18:30",
       address: "B-12, Student Block",
       payment: "Card",
       status: "Delivered",
+      canteen: "Hall 6", // Added canteen information
     },
   ];
 
@@ -34,7 +34,7 @@ const OrderHistory = () => {
     <div className="order-history-container">
       {/* Top Navigation */}
       <div className="top-bar">
-      <h1 className="website-name" onClick={() => navigate("/")}>
+        <h1 className="website-name" onClick={() => navigate("/")}>
           CampusCrave
         </h1>
         <input
@@ -70,6 +70,7 @@ const OrderHistory = () => {
             <p className="order-total"><strong>Total</strong> <span>Rs. {order.total}</span></p>
             <p className="order-info"><strong>Delivery Address:</strong> {order.address}</p>
             <p className="order-info"><strong>Paid by:</strong> {order.payment}</p>
+            <p className="order-info"><strong>Canteen:</strong> {order.canteen}</p> {/* Added Canteen Display */}
             <p className={`order-status ${order.status.toLowerCase()}`}>
               <strong>Order Status:</strong> {order.status}
             </p>
@@ -80,4 +81,4 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory;
+export default Orders;
