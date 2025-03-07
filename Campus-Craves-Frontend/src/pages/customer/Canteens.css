@@ -1,0 +1,129 @@
+.hero {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: black;
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+}
+
+.hero-image {
+  width: 35vw;
+  display: block;
+  margin-left: auto;
+  margin-right: 10vw;
+  max-width: 300px; /* Prevents image from being too large on small screens */
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-182%, 100%);
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.search-box {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  width: 20vw;
+  margin-left: 21vw;
+  margin-right: auto;
+  min-width: 180px; /* Ensures usability on small screens */
+}
+
+.food {
+  margin-top: 5vh;
+  margin-left: 2vw;
+  font-weight: 7000;
+  font-size: clamp(16px, 2vw, 24px); /* Keeps font size responsive */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .hero {
+    flex-wrap: nowrap; /* Keeps elements in a single line */
+    height: auto; /* Adjusts height dynamically */
+  }
+
+  .hero-image {
+    width: 40vw; /* Slightly larger on medium screens */
+    max-width: 250px;
+  }
+
+  .hero-overlay {
+    transform: translate(-150%, 100%); /* Adjusts positioning */
+  }
+
+  .search-box {
+    width: 25vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+  }
+
+  .hero-image {
+    width: 50vw;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .hero-overlay {
+    transform: translate(-100%, 50%);
+  }
+
+  .search-box {
+    width: 40vw;
+    min-width: 160px;
+  }
+
+  .food {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .hero-image {
+    width: 70vw;
+    max-width: 180px;
+  }
+
+  .hero-overlay {
+    transform: translate(-80%, 50%);
+  }
+
+  .search-box {
+    width: 60vw;
+    min-width: 140px;
+  }
+
+  .food {
+    font-size: 16px;
+  }
+}
+
+.para {
+  color: white;
+  margin: 15vh auto auto 5vw;
+  display: flex;
+  flex-direction: column;  /* Ensures "fingertips" moves to the next line */
+  font-size: 3vw;  /* Responsive font size */
+}
+
+.fing {
+  color: orange;
+}
