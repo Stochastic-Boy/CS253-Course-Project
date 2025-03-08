@@ -1,0 +1,192 @@
+.categories-view-container {
+  padding: 24px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.website-name {
+  font-size: 24px;
+  color: orange;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.website-name:hover {
+  color: grey;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  background-color: #6c757d;
+  cursor: pointer;
+}
+
+.categories-content {
+  display: flex;
+  gap: 24px;
+}
+
+.new-category-section,
+.existing-categories-section {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.new-category-section {
+  flex: 1;
+  max-width: 30%;
+}
+
+.existing-categories-section {
+  flex: 2;
+  max-width: 70%;
+}
+
+.new-category-section h2,
+.existing-categories-section h2 {
+  margin-bottom: 16px;
+}
+
+.new-category-section input,
+.new-category-section select {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.add-category-button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  background-color: orange;
+  cursor: pointer;
+}
+
+.category-type {
+  margin-bottom: 16px;
+}
+
+.category-type-button {  
+  width: 100%; /* Adjust width to half the space */
+  padding: 40px; /* Make the button broader */
+  border-radius: 8px;
+  color: rgb(255, 255, 255);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: transform 0.3s;
+}
+
+.category-type-button:hover {
+  transform: scale(1.05);
+}
+
+.category-list {
+  margin-top: 8px;
+  padding-left: 16px;
+}
+
+.category-item {
+  padding: 2px; /* Further reduce padding */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+  margin-bottom: 2px; /* Further reduce margin */
+  max-width: 48%; /* Ensure it is not broader than category type buttons */
+  height: 100px; /* Reduce vertical size */
+  position: relative; /* Add relative positioning */
+}
+
+.category-item h3 {
+  margin: 0;
+  font-size: 2rem; /* Further increase font size */
+}
+
+.category-item p {
+  margin: 4px 0;
+  font-size: 1rem; /* Further increase font size */
+}
+
+.edit-category-button {
+  padding: 4px 8px; /* Adjust padding */
+  border-radius: 8px;
+  color: white;
+  background-color: orange;
+  cursor: pointer;
+  font-size: 1rem; /* Adjust font size */
+  position: absolute; /* Position absolutely */
+  top: 0; /* Position at the top */
+  right: 0; /* Position at the right */
+  height: 50%; /* Make it half the height of the category item */
+  width:20%; /* Full width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-category-button {
+  padding: 4px 8px; /* Adjust padding */
+  border-radius: 8px;
+  color: white;
+  background-color: red;
+  cursor: pointer;
+  font-size: 1rem; /* Adjust font size */
+  position: absolute; /* Position absolutely */
+  bottom: 0; /* Position at the bottom */
+  right: 0; /* Position at the right */
+  height: 50%; /* Make it half the height of the category item */
+  width: 20%; /* Full width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add background images for each category type */
+.category-type-button.Snacks-Veg {
+  background-image: url('public/assets/pasta.jpg'); /* Add your image URL here */
+}
+
+.category-type-button.Snacks-Non-veg {
+  background-image: url('public/assets/snacksnvg.jpg'); /* Add your image URL here */
+}
+
+.category-type-button.Main-Course-Veg {
+  background-image: url('public/assets/maincourse2.jpg'); /* Add your image URL here */
+}
+
+.category-type-button.Main-Course-Non-Veg {
+  background-image: url('public/assets/maincoursenvg.jpg'); /* Add your image URL here */
+}
+
+.category-type-button.Desserts {
+  background-image: url('/public/assets/deserts.jpg'); /* Add your image URL here */
+}
+
+.category-type-button.Beverages {
+  background-image: url('/public/assets/beverages.jpg'); 
+}
+.category-type-button.Packed-Food {
+    background-image: url('/public/assets/Packedfood1.jpg'); 
+  }
