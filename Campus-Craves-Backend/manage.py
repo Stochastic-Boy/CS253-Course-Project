@@ -2,11 +2,15 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import celery
+celery_app = celery.Celery('campus_craves_backend')
+celery_app.config_from_object('django.conf:settings', namespace='CELERY')
+celery_app.autodiscover_tasks()
 
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Campus_Craves_Backend.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'campus_craves_backend.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
