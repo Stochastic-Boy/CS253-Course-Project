@@ -11,6 +11,8 @@ import LoginForm from "./components/LoginForm";
 import SellerLoginPage from "./pages/seller/SellerLoginPage";
 import SellerSignUpPage from "./pages/seller/SellerSignUpPage";
 import ProductsView from "./pages/seller/ProductsView";
+import OrdersView from "./pages/seller/OrdersView";
+import CategoriesView from "./pages/seller/CategoriesView";
 
 const App = () => {
   return (
@@ -28,6 +30,8 @@ const App = () => {
         <Route path="/buyer-signup" element={<BuyerSignUpPage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/productsview" element={<ProductsView />} />
+        <Route path="/ordersview" element={<OrdersView />} />
+        <Route path="/categoriesview" element={<CategoriesView />} />
       </Routes>
     </Router>
   );

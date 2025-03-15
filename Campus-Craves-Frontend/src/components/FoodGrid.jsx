@@ -3,18 +3,18 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const foodItems = [
-  { id: 1, image: "public/assets/canteenimg.png", name: "Hall 5", type: "Canteen", open_till: "3:00 AM" },
-  { id: 2, image: "public/assets/canteenimg.png", name: "Canteen B", type: "Canteen", open_till: "3:00 AM" },
-  { id: 3, image: "public/assets/canteenimg.png", name: "Canteen C", type: "Canteen", open_till: "3:00 AM" },
-  { id: 4, image: "public/assets/canteenimg.png", name: "Canteen D", type: "Canteen", open_till: "3:00 AM" },
-  { id: 5, image: "public/assets/canteenimg.png", name: "Canteen E", type: "Canteen", open_till: "3:00 AM" },
-  { id: 6, image: "public/assets/canteenimg.png", name: "Canteen F", type: "Canteen", open_till: "3:00 AM" },
-  { id: 7, image: "public/assets/canteenimg.png", name: "Canteen G", type: "Canteen", open_till: "3:00 AM" },
-  { id: 8, image: "public/assets/canteenimg.png", name: "Canteen H", type: "Canteen", open_till: "3:00 AM" },
-  { id: 9, image: "public/assets/canteenimg.png", name: "Canteen I", type: "Canteen", open_till: "3:00 AM" },
-  { id: 10, image: "public/assets/canteenimg.png", name: "Canteen J", type: "Canteen", open_till: "3:00 AM" },
-  { id: 11, image: "public/assets/canteenimg.png", name: "Canteen K", type: "Canteen", open_till: "3:00 AM" },
-  { id: 12, image: "public/assets/canteenimg.png", name: "Canteen L", type: "Canteen", open_till: "3:00 AM" },
+  { id: 1, image: "/assets/canteenimg.png", name: "Hall 5", type: "Canteen", open_till: "3:00 AM" },
+  { id: 2, image: "/assets/canteenimg.png", name: "Canteen B", type: "Canteen", open_till: "3:00 AM" },
+  { id: 3, image: "/assets/canteenimg.png", name: "Canteen C", type: "Canteen", open_till: "3:00 AM" },
+  { id: 4, image: "/assets/canteenimg.png", name: "Canteen D", type: "Canteen", open_till: "3:00 AM" },
+  { id: 5, image: "/assets/canteenimg.png", name: "Canteen E", type: "Canteen", open_till: "3:00 AM" },
+  { id: 6, image: "/assets/canteenimg.png", name: "Canteen F", type: "Canteen", open_till: "3:00 AM" },
+  { id: 7, image: "/assets/canteenimg.png", name: "Canteen G", type: "Canteen", open_till: "3:00 AM" },
+  { id: 8, image: "/assets/canteenimg.png", name: "Canteen H", type: "Canteen", open_till: "3:00 AM" },
+  { id: 9, image: "/assets/canteenimg.png", name: "Canteen I", type: "Canteen", open_till: "3:00 AM" },
+  { id: 10, image: "/assets/canteenimg.png", name: "Canteen J", type: "Canteen", open_till: "3:00 AM" },
+  { id: 11, image: "/assets/canteenimg.png", name: "Canteen K", type: "Canteen", open_till: "3:00 AM" },
+  { id: 12, image: "/assets/canteenimg.png", name: "Canteen L", type: "Canteen", open_till: "3:00 AM" },
 ];
 
 const FoodGrid = () => {

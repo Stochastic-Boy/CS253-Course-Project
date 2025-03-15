@@ -18,7 +18,7 @@ export default function ProductsView() {
     ]);
     setNewProduct({ title: "", category: "", price: "" });
   };
-
+  
   const toggleStock = (id) => {
     setProducts(
       products.map((product) =>
@@ -33,13 +33,19 @@ export default function ProductsView() {
 
       {/* Sidebar */}
       <div className="sidebar">
-      <h2>
-      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-        Campus Craves
-      </Link>
-      </h2>
-        <button>Orders</button>
-        <button>Categories</button>
+        <h2>
+        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          Campus Craves
+        </Link>
+        </h2>
+        <Link to="/ordersview">
+          <button>Orders</button>
+        </Link>
+
+        <Link to="/categoriesview">
+          <button>Categories</button>
+        </Link>
+        
         <Link to="/productsview">
            <button >Products</button>
          </Link>
