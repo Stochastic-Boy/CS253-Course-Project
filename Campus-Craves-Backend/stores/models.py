@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User  # Import User model
+from users.models import User
 
 class Store(models.Model):
     """Model for a store managed by sellers"""

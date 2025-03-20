@@ -1,15 +1,15 @@
+# orders/views.py
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Order, OrderItem
 from .serializers import OrderSerializer
-from cart.models import Cart, CartItem
+from .controller import create_order, get_order_by_id, update_order_status, cancel_order
+from cart.models import Cart
 import pdfkit
 from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-
-
 
 class OrderListView(generics.ListAPIView):
     """Retrieve all orders for a logged-in user"""
@@ -19,55 +19,57 @@ class OrderListView(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(buyer=self.request.user).order_by('-created_at')
 
-class CreateOrderView(APIView):
+class OrderCreateView(APIView):
     """Create an order from the cart"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        cart = Cart.objects.get(buyer=request.user)
-        if not cart.items.exists():
-            return Response({"error": "Cart is empty"}, status=400)
-        
-        order = Order.objects.create(
-            buyer=request.user,
-            store=cart.store,
-            total_amount=cart.total_price(),
-            payment_method=request.data.get("payment_method"),
-            delivery_address=request.data.get("delivery_address")
-        )
+    def post(self, request):
+        user = request.user
+        store_id = request.data.get('store_id')
+        payment_method = request.data.get('payment_method')
+        delivery_address = request.data.get('delivery_address')
 
-        for cart_item in cart.items.all():
-            OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity, price=cart_item.total_price())
+        order, error = create_order(user, store_id, payment_method, delivery_address)
+        if error:
+            return Response({"error": error}, status=400)
+        return Response({"message": "Order placed successfully", "order_id": order.id})
 
-        cart.items.all().delete()
-        return Response({"message": "Order placed successfully", "order": OrderSerializer(order).data})
-
-class UpdateOrderStatusView(generics.UpdateAPIView):
-    """Allows sellers to update order status"""
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+class OrderDetailView(APIView):
+    """API to fetch a single order"""
     permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request, order_id):
+        order = get_order_by_id(order_id)
+        if order:
+            return Response(OrderSerializer(order).data)
+        return Response({"error": "Order not found"}, status=404)
 
-class CancelOrderView(APIView):
-    """Allows buyers to cancel an order"""
+class OrderUpdateView(APIView):
+    """API to update order status"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, order_id, *args, **kwargs):
-        try:
-            order = Order.objects.get(id=order_id, buyer=request.user)
+    def put(self, request, order_id):
+        order = get_order_by_id(order_id)
+        if order:
+            new_status = request.data.get('status')
+            updated_order, error = update_order_status(order, new_status, request.user)
+            if error:
+                return Response({"error": error}, status=403)
+            return Response({"message": "Order status updated"})
+        return Response({"error": "Order not found"}, status=404)
 
-            # Prevent cancellation if order is already processed
-            if order.status in ["dispatched", "delivered"]:
-                return Response({"error": "Cannot cancel order after dispatch"}, status=400)
+class OrderCancelView(APIView):
+    """API to cancel an order"""
+    permission_classes = [permissions.IsAuthenticated]
 
-            order.status = "cancelled"
-            order.save()
+    def delete(self, request, order_id):
+        order = get_order_by_id(order_id)
+        if order:
+            cancelled_order, error = cancel_order(order, request.user)
+            if error:
+                return Response({"error": error}, status=403)
             return Response({"message": "Order cancelled successfully"})
-
-        except Order.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
-        
+        return Response({"error": "Order not found"}, status=404)
 
 class OrderInvoiceView(APIView):
     """Generates a PDF invoice for an order"""
@@ -75,19 +77,16 @@ class OrderInvoiceView(APIView):
 
     def get(self, request, order_id, *args, **kwargs):
         try:
-            order = Order.objects.get(id=order_id, buyer=request.user)
+            order = get_order_by_id(order_id)
+            if not order or order.buyer != request.user:
+                return Response({"error": "Order not found or unauthorized"}, status=404)
+            
             order_items = OrderItem.objects.filter(order=order)
-
-            # Render invoice template to HTML
             html_content = render_to_string("invoice_template.html", {"order": order, "items": order_items})
-
-            # Convert HTML to PDF
             pdf = pdfkit.from_string(html_content, False, configuration=settings.PDFKIT_CONFIG)
-
-            # Return PDF response
+            
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="invoice_{order.id}.pdf"'
             return response
-
-        except Order.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
+        except Exception as e:
+            return Response({"error": "An error occurred while generating invoice", "details": str(e)}, status=500)

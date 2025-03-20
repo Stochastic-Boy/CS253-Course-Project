@@ -1,49 +1,40 @@
 from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .models import Store
 from .serializers import StoreSerializer
-from rest_framework.permissions import IsAuthenticated
+from .controller import create_store, get_all_stores, get_store_by_id, update_store, delete_store
 
-
-# Create a Store (Seller Only)
 class StoreCreateView(generics.CreateAPIView):
     serializer_class = StoreSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(seller=self.request.user)
+        create_store(self.request.user, **serializer.validated_data)
 
-# List All Stores
 class StoreListView(generics.ListAPIView):
-    queryset = Store.objects.all()
+    queryset = get_all_stores()
     serializer_class = StoreSerializer
-    permission_classes = [permissions.AllowAny]
 
-# Retrieve, Update, Delete a Store (Seller Only)
-class StoreDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StoreSerializer
+class StoreDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return Store.objects.filter(seller=self.request.user)
+    def get(self, request, store_id):
+        store = get_store_by_id(store_id)
+        if store:
+            return Response(StoreSerializer(store).data)
+        return Response({"error": "Store not found"}, status=404)
 
+    def put(self, request, store_id):
+        store = get_store_by_id(store_id)
+        if store and store.seller == request.user:
+            update_store(store, **request.data)
+            return Response({"message": "Store updated"})
+        return Response({"error": "Unauthorized or not found"}, status=403)
 
-class StoreDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StoreSerializer
-    permission_classes = [IsAuthenticated]  # ✅ Ensure only logged-in users can access
-
-    def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Store.objects.none()  # ✅ Prevent error for unauthenticated users
-        return Store.objects.filter(seller=self.request.user)
-
-
-
-class StoreDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StoreSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        # Prevent Swagger from causing authentication errors
-        if getattr(self, 'swagger_fake_view', False):
-            return Store.objects.none()
-        return Store.objects.filter(seller=self.request.user)
+    def delete(self, request, store_id):
+        store = get_store_by_id(store_id)
+        if store and store.seller == request.user:
+            delete_store(store)
+            return Response({"message": "Store deleted"})
+        return Response({"error": "Unauthorized or not found"}, status=403)

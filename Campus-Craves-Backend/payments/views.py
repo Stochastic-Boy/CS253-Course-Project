@@ -1,67 +1,58 @@
-import razorpay
-from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from .models import Payment
 from orders.models import Order
-
-client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+from .controller import create_payment, verify_payment, get_payment_by_order, process_refund
 
 class CreatePaymentView(APIView):
     """Initiate payment with Razorpay"""
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        user = request.user
         order_id = request.data.get("order_id")
-        try:
-            order = Order.objects.get(id=order_id, buyer=request.user)
-            amount = int(order.total_amount * 100)  # Convert to paise for Razorpay
-            
-            # Create payment order
-            payment_data = client.order.create({
-                "amount": amount,
-                "currency": "INR",
-                "payment_capture": "1"
-            })
-
-            # Save payment record
-            Payment.objects.create(
-                user=request.user, order=order, amount=order.total_amount,
-                method="CARD", transaction_id=payment_data["id"], status="Pending"
-            )
-
-            return Response({"payment_id": payment_data["id"], "amount": amount})
+        method = request.data.get("method")
+        amount = request.data.get("amount")
         
+        try:
+            order = Order.objects.get(id=order_id, buyer=user)
+            payment = create_payment(user, order, method, amount)
+            return Response({"message": "Payment initiated", "transaction_id": payment.transaction_id})
         except Order.DoesNotExist:
             return Response({"error": "Order not found"}, status=404)
 
 class VerifyPaymentView(APIView):
-    """Verify Razorpay Payment"""
+    """Verify a payment"""
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request):
-        payment_id = request.data.get("razorpay_payment_id")
-        order_id = request.data.get("order_id")
-        signature = request.data.get("razorpay_signature")
+        payment_id = request.data.get("payment_id")
+        razorpay_payment_id = request.data.get("razorpay_payment_id")
+        razorpay_signature = request.data.get("razorpay_signature")
+        
+        payment, error = verify_payment(payment_id, razorpay_payment_id, razorpay_signature)
+        if error:
+            return Response({"error": error}, status=400)
+        return Response({"message": "Payment verified successfully"})
 
-        try:
-            payment = Payment.objects.get(transaction_id=order_id)
+class PaymentDetailView(APIView):
+    """Fetch payment details for an order"""
+    permission_classes = [permissions.IsAuthenticated]
 
-            # Verify signature
-            params = {
-                "razorpay_order_id": order_id,
-                "razorpay_payment_id": payment_id,
-                "razorpay_signature": signature
-            }
+    def get(self, request, order_id):
+        payment = get_payment_by_order(order_id)
+        if payment:
+            return Response({"order_id": order_id, "method": payment.method, "status": payment.status})
+        return Response({"error": "Payment not found"}, status=404)
 
-            is_valid = client.utility.verify_payment_signature(params)
+class RefundPaymentView(APIView):
+    """Process a refund for an order"""
+    permission_classes = [permissions.IsAuthenticated]
 
-            if is_valid:
-                payment.status = "Paid"
-                payment.save()
-                return Response({"message": "Payment verified"})
-            else:
-                return Response({"error": "Payment verification failed"}, status=400)
-
-        except Payment.DoesNotExist:
-            return Response({"error": "Payment not found"}, status=404)
+    def post(self, request, order_id):
+        payment, error = process_refund(order_id)
+        if error:
+            return Response({"error": error}, status=404)
+        return Response({"message": "Refund processed successfully"})

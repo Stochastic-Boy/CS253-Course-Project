@@ -7,7 +7,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('id', 'email', 'username', 'role', 'is_active', 'is_staff')
     list_filter = ('role', 'is_staff', 'is_active')
     search_fields = ('email', 'username')
-    ordering = ('id',)
+    ordering = ('id', )
 
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password', 'role')}),

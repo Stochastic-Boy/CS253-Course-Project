@@ -1,9 +1,9 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Cart, CartItem
+from .models import CartItem
 from .serializers import CartSerializer, CartItemSerializer
-from products.models import Product
+from .controller import get_cart_by_user, add_to_cart, remove_from_cart, clear_cart
 
 class CartView(generics.RetrieveAPIView):
     """Retrieve the cart for a logged-in user"""
@@ -11,32 +11,33 @@ class CartView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        return Cart.objects.get_or_create(buyer=self.request.user, store=self.request.user.store)[0]
+        return get_cart_by_user(self.request.user)
 
 class AddToCartView(APIView):
-    """API to add items to the cart"""
+    """Add an item to the cart"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        cart, _ = Cart.objects.get_or_create(buyer=request.user, store=request.user.store)
-        product = Product.objects.get(id=request.data.get("product_id"))
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        if not created:
-            cart_item.quantity += 1
-        cart_item.save()
-        return Response({"message": "Product added to cart", "cart": CartSerializer(cart).data})
-
-class UpdateCartItemView(generics.UpdateAPIView):
-    """Update quantity of cart items"""
-    queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        product_id = request.data.get("product_id")
+        quantity = request.data.get("quantity", 1)
+        cart_item = add_to_cart(request.user, product_id, quantity)
+        if cart_item:
+            return Response({"message": "Item added to cart", "cart_item": CartItemSerializer(cart_item).data})
+        return Response({"error": "Product not found"}, status=404)
 
 class RemoveFromCartView(APIView):
     """Remove an item from the cart"""
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, item_id, *args, **kwargs):
-        cart_item = CartItem.objects.get(id=item_id)
-        cart_item.delete()
-        return Response({"message": "Product removed from cart"})
+    def delete(self, request, cart_item_id):
+        if remove_from_cart(cart_item_id):
+            return Response({"message": "Item removed from cart"})
+        return Response({"error": "Item not found"}, status=404)
+
+class ClearCartView(APIView):
+    """Clear all items from the cart"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request):
+        clear_cart(request.user)
+        return Response({"message": "Cart cleared"})

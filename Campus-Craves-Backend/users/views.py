@@ -13,6 +13,10 @@ from .serializers import UserSerializer, BuyerProfileSerializer, SellerProfileSe
 from django.core.mail import send_mail
 import random
 from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .controller import get_user_by_email, create_user, authenticate_user
+import json
 
 # Generate OTP Dictionary (Temporary storage)
 OTP_STORAGE = {}
@@ -127,3 +131,20 @@ class UserProfile(RetrieveUpdateAPIView):
         if self.request.user.role == "buyer":
             return BuyerProfileSerializer
         return SellerProfileSerializer
+
+
+@csrf_exempt
+def user_login(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user = authenticate_user(data["email"], data["password"])
+        if user:
+            return JsonResponse({"message": "Login successful", "user_id": user.id})
+        return JsonResponse({"error": "Invalid credentials"}, status=400)
+
+@csrf_exempt
+def user_signup(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user = create_user(data["email"], data["username"], data["password"], data["role"])
+        return JsonResponse({"message": "User created", "user_id": user.id})
