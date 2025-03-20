@@ -1,9 +1,27 @@
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Product
+from .models import Product, Category
 
-def create_product(store, name, description, price, stock, category):
-    """Create a new product for a store."""
-    return Product.objects.create(store=store, name=name, description=description, price=price, stock=stock, category=category)
+def create_category(store, name):
+    """Create a new category for a store"""
+    category, created = Category.objects.get_or_create(name=name, created_by=store)
+    return category, created
+
+def get_all_categories():
+    """Retrieve all categories"""
+    return Category.objects.all()
+
+def get_products_by_category(category_id):
+    """Retrieve all products belonging to a specific category."""
+    return Product.objects.filter(category_id=category_id)
+
+
+def create_product(store, name, description, price, stock, category_id):
+    """Create a new product for a store"""
+    try:
+        category = Category.objects.get(id=category_id)
+        return Product.objects.create(store=store, name=name, description=description, price=price, stock=stock, category=category)
+    except ObjectDoesNotExist:
+        return None
 
 def get_all_products():
     """Retrieve all products."""

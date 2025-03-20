@@ -1,9 +1,35 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Product
-from .serializers import ProductSerializer
-from .controller import create_product, get_all_products, get_product_by_id, update_product, delete_product
+from .serializers import ProductSerializer, CategorySerializer
+from .controller import create_product, get_all_products, get_product_by_id, update_product, delete_product, get_all_categories, create_category, get_products_by_category
+
+class CategoryCreateView(APIView):
+    """API to create a category (Store Manager only)"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        store = request.user.stores.first()
+        name = request.data.get("name")
+
+        category, created = create_category(store, name)
+        if created:
+            return Response({"message": "Category created", "category_id": category.id})
+        return Response({"error": "Category already exists"}, status=400)
+
+class CategoryListView(generics.ListAPIView):
+    """API to list all categories"""
+    queryset = get_all_categories()
+    serializer_class = CategorySerializer
+
+class ProductsByCategoryView(APIView):
+    """Retrieve all products under a specific category."""
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, category_id):
+        products = get_products_by_category(category_id)
+        return Response(ProductSerializer(products, many=True).data)
+
 
 class ProductCreateView(generics.CreateAPIView):
     """API to create a product (Seller only)"""
@@ -11,7 +37,7 @@ class ProductCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        store = self.request.user.stores.first()  # Ensure correct store selection
+        store = self.request.user.stores.first()
         create_product(store, **serializer.validated_data)
 
 class ProductListView(generics.ListAPIView):
