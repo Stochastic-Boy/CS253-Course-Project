@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Order, OrderItem
 from .serializers import OrderSerializer
-from .controller import create_order, get_order_by_id, update_order_status, cancel_order
+from .controller import create_order, get_order_by_id, update_order_status, cancel_order, get_orders_by_seller, get_past_orders_by_seller, update_order_status_by_seller
 from cart.models import Cart
 import pdfkit
 from django.conf import settings
@@ -90,3 +90,36 @@ class OrderInvoiceView(APIView):
             return response
         except Exception as e:
             return Response({"error": "An error occurred while generating invoice", "details": str(e)}, status=500)
+        
+
+
+class SellerOrderListView(APIView):
+    """Retrieve all orders for a seller's store."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        seller = request.user
+        orders = get_orders_by_seller(seller)
+        return Response(OrderSerializer(orders, many=True).data)
+
+class SellerPastOrderListView(APIView):
+    """Retrieve past orders (completed or canceled) for a seller's store."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        seller = request.user
+        orders = get_past_orders_by_seller(seller)
+        return Response(OrderSerializer(orders, many=True).data)
+
+class SellerUpdateOrderStatusView(APIView):
+    """Allow sellers to update order status."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, order_id):
+        seller = request.user
+        new_status = request.data.get("status")
+
+        order, error = update_order_status_by_seller(order_id, new_status, seller)
+        if error:
+            return Response({"error": error}, status=403)
+        return Response({"message": "Order status updated successfully"})
