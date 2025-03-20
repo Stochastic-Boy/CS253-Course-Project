@@ -77,12 +77,12 @@ const Menu = () => {
   return (
     <div className="orgmenu">
       <Header/>
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-gray-100 p-4 flex flex-col md:flex-row">
       {/* Sidebar for larger screens, Dropdown for mobile */}
-      <aside className="w-full ">
-        <h2 className="text-lg ">Categories</h2>
+      <aside className="w-full md:w-1/6 bg-white p-4 shadow-md mb-4 md:mb-0">
+        <h2 className="text-lg font-bold mb-4">Categories</h2>
         <select
-          className="md:hidden "
+          className="md:hidden w-full p-2 border rounded-md"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
@@ -90,11 +90,11 @@ const Menu = () => {
             <option key={category} value={category}>{category}</option>
           ))}
         </select>
-        <div className="hidden ">
+        <div className="hidden md:block">
           {categories.map((category) => (
             <button 
               key={category} 
-              className={`block ${selectedCategory === category ? "" : ""}`} 
+              className={`block w-full p-2 text-left rounded-md ${selectedCategory === category ? "bg-orange-500 text-white" : "hover:bg-gray-200"}`} 
               onClick={() => setSelectedCategory(category)}
             >
               {category}
