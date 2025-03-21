@@ -8,7 +8,7 @@ const Homeimg = () => {
       Tasty food at your <br />
       <span className="fing">Fingertips</span>
     </h1>
-    <input type="text" placeholder="Search for food..." className="search-box" />
+    
   </div>
 </div>
   );

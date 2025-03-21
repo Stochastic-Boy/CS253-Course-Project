@@ -37,11 +37,7 @@ const Orders = () => {
         <h1 className="website-name" onClick={() => navigate("/")}>
           CampusCrave
         </h1>
-        <input
-          type="text"
-          placeholder="Search your order"
-          className="search-box"
-        />
+        
       </div>
 
       {/* Navigation Buttons */}
