@@ -27,6 +27,8 @@ const Login = () => {
       }
 
       localStorage.setItem("role", loginData.role);
+      localStorage.setItem("access_token", loginData.access_token); // if available
+      localStorage.setItem("user", JSON.stringify(loginData.user || { email }));
 
       // Redirect based on role
       if (loginData.role === "seller") {
@@ -34,6 +36,7 @@ const Login = () => {
       } else {
         navigate("/");
       }
+      window.location.reload();
     } catch (error) {
       setError("Something went wrong. Please try again.");
       console.error("Login Error:", error);
