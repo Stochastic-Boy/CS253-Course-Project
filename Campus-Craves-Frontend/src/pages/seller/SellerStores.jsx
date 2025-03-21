@@ -79,6 +79,9 @@ const SellerStores = () => {
           </li>
         ))}
       </ul>
+      <button onClick={() => navigate("/")} className="nav-button home-button">
+          Go to Home Page
+        </button>
     </div>
   );
 };
