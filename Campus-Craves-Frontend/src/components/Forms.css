@@ -93,7 +93,15 @@
   .login-link:hover, .signup-link:hover {
     color: grey;
   }
-  
+  .role-dropdown{
+    width: 100%;
+    padding: 0.875rem;
+    margin: 0.625rem 0;
+    border: 0.063rem solid #ccc;
+    border-radius: 0.625rem;
+    background: #f0f0f0;
+    font-size: 1rem;
+  }
   /* Responsive Styles (Tablets & Mobiles) */
   @media (max-width: 48rem) {
   .login-form, .signup-form {

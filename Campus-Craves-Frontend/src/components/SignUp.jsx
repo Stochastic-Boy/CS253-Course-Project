@@ -44,10 +44,10 @@ const SignUp = () => {
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         
-        <select value={role} onChange={(e) => setRole(e.target.value)} required>
+        <select class ="role-dropdown" value={role} onChange={(e) => setRole(e.target.value)} required>
           <option value="">Select Role</option>
-          <option value="buyer">buyer</option>
-          <option value="seller">seller</option>
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
         </select>
 
       
