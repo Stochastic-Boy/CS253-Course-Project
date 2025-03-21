@@ -154,7 +154,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r"C:\Users\Siddharth Pathak\Downloads\wkhtmltox-0.12.6-1.msvc2015-win64.exe")
+PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
 
 RAZORPAY_KEY_ID = "your_razorpay_key_id"
 RAZORPAY_KEY_SECRET = "your_razorpay_key_secret"
