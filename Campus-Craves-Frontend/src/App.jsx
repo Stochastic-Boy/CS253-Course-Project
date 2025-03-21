@@ -10,7 +10,7 @@ import ProductsView from "./pages/seller/ProductsView";
 import OrdersView from "./pages/seller/OrdersView";
 import CategoriesView from "./pages/seller/CategoriesView";
 import SellerStores from "./pages/seller/SellerStores";
-
+import Profile from "./components/Profile";
 const App = () => {
   return (
     <Router>
@@ -26,6 +26,7 @@ const App = () => {
         <Route path="/ordersview" element={<OrdersView />} />
         <Route path="/categoriesview" element={<CategoriesView />} />
         <Route path="/sellerstores" element={<SellerStores />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
