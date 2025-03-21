@@ -67,84 +67,81 @@ const Menu = () => {
   };
 
   const total = Object.values(cart).reduce((sum, item) => sum + item.price * item.quantity, 0);
-  
+
   const filteredProducts = searchTerm
-    ? Object.values(products)
-        .flat()
-        .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    ? Object.values(products).flat().filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
     : products[selectedCategory] || [];
 
   return (
     <div className="orgmenu">
-      <Header/>
-    <div className="min-h-screen bg-gray-100 p-4 flex flex-col md:flex-row">
-      {/* Sidebar for larger screens, Dropdown for mobile */}
-      <aside className="w-full md:w-1/6 bg-white p-4 shadow-md mb-4 md:mb-0">
-        <h2 className="text-lg font-bold mb-4">Categories</h2>
-        <select
-          className="md:hidden w-full p-2 border rounded-md"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((category) => (
-            <option key={category} value={category}>{category}</option>
-          ))}
-        </select>
-        <div className="hidden md:block">
-          {categories.map((category) => (
-            <button 
-              key={category} 
-              className={`block w-full p-2 text-left rounded-md ${selectedCategory === category ? "bg-orange-500 text-white" : "hover:bg-gray-200"}`} 
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </aside>
+    <Header/>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", padding: "16px", background: "#f7f7f7" }}>
+      <style>
+        {`
+          @media (min-width: 768px) {
+            .layout { display: flex; flex-direction: row; }
+            .sidebar { width: 16%; }
+            .content { flex: 1; }
+            .cart { width: 25%; }
+          }
+        `}
+      </style>
       
-      {/* Main Content */}
-      <div className="flex-1 p-4">
-        <h2 className="text-xl font-bold mb-4">{selectedCategory}</h2>
-        <input
-          type="text"
-          placeholder="Search for items..."
-          className="w-full p-2 mb-4 border rounded-md"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <div className="bg-white p-4 rounded-md shadow-md">
-          {filteredProducts.map((item) => (
-            <div key={item.id} className="flex justify-between items-center border-b p-2">
-              <span>{item.name}</span>
-              <span>₹{item.price}</span>
-              <button onClick={() => handleAddToCart(item)} className="bg-orange-500 text-white px-4 py-1 rounded-md">Add</button>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Cart */}
-      <aside className="w-full md:w-1/4 bg-white p-4 shadow-md">
-        <h2 className="text-lg font-bold mb-4">Items in Cart</h2>
-        {Object.values(cart).length > 0 ? (
-          Object.values(cart).map((item) => (
-            <div key={item.id} className="flex justify-between items-center border-b p-2">
-              <span>{item.name}</span>
-              <span>₹{item.price}</span>
-              <div className="flex items-center gap-2">
-                <button onClick={() => handleQuantityChange(item.id, -1)} className="bg-gray-300 px-2 rounded">-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => handleQuantityChange(item.id, 1)} className="bg-gray-300 px-2 rounded">+</button>
+      <div className="layout">
+        {/* Sidebar */}
+        <aside className="sidebar" style={{ background: "white", padding: "16px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>Categories</h2>
+          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} style={{ width: "100%", padding: "8px", marginBottom: "8px" }}>
+            {categories.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+          <div>
+            {categories.map((category) => (
+              <button key={category} style={{ display: "block", width: "100%", padding: "8px", textAlign: "left", background: selectedCategory === category ? "#ff6600" : "white", color: selectedCategory === category ? "white" : "black", border: "none", cursor: "pointer" }} onClick={() => setSelectedCategory(category)}>
+                {category}
+              </button>
+            ))}
+          </div>
+        </aside>
+        
+        {/* Main Content */}
+        <div className="content" style={{ padding: "16px" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>{selectedCategory}</h2>
+          <input type="text" placeholder="Search for items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: "100%", padding: "8px", marginBottom: "16px" }} />
+          <div style={{ background: "white", padding: "16px", borderRadius: "8px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
+            {filteredProducts.map((item) => (
+              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px", borderBottom: "1px solid #ddd" }}>
+                <span>{item.name}</span>
+                <span>₹{item.price}</span>
+                <button onClick={() => handleAddToCart(item)} style={{ background: "#ff6600", color: "white", padding: "4px 8px", border: "none", cursor: "pointer" }}>Add</button>
               </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No items in cart</p>
-        )}
-        <div className="mt-4 font-bold text-right">Total: ₹{total}</div>
-        <button className="w-full bg-black text-white p-2 mt-2 rounded-md">Checkout →</button>
-      </aside>
+            ))}
+          </div>
+        </div>
+        
+        {/* Cart */}
+        <aside className="cart" style={{ background: "white", padding: "16px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>Items in Cart</h2>
+          {Object.values(cart).length > 0 ? (
+            Object.values(cart).map((item) => (
+              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px", borderBottom: "1px solid #ddd" }}>
+                <span>{item.name}</span>
+                <span>₹{item.price}</span>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <button onClick={() => handleQuantityChange(item.id, -1)} style={{ padding: "4px", background: "#ddd", border: "none", cursor: "pointer" }}>-</button>
+                  <span style={{ margin: "0 8px" }}>{item.quantity}</span>
+                  <button onClick={() => handleQuantityChange(item.id, 1)} style={{ padding: "4px", background: "#ddd", border: "none", cursor: "pointer" }}>+</button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: "gray" }}>No items in cart</p>
+          )}
+          <div style={{ marginTop: "16px", fontWeight: "bold", textAlign: "right" }}>Total: ₹{total}</div>
+          <button style={{ width: "100%", background: "black", color: "white", padding: "8px", marginTop: "8px", border: "none", cursor: "pointer" }}>Checkout →</button>
+        </aside>
+      </div>
     </div>
     </div>
   );
