@@ -25,9 +25,9 @@ const SignUp = () => {
       console.log("User registered successfully:", data);
       
       if (role === "seller") {
-        navigate("/sellerstores");
+        navigate("/login");
       } else {
-        navigate("/");
+        navigate("/login");
       }
     } else {
       setError(data.error || "Registration failed.");
