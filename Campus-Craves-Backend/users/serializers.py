@@ -6,12 +6,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'role']
+        fields = ['id', 'email', 'username', 'password', 'role']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         """Create and return a new user with an encrypted password"""
-        user = User.objects.create_user(**validated_data)
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
 
 class BuyerProfileSerializer(serializers.ModelSerializer):
@@ -27,5 +30,4 @@ class SellerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = SellerProfile
         fields = '__all__'
-
 
