@@ -10,7 +10,7 @@ class StoreCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        create_store(self.request.user, **serializer.validated_data)
+        serializer.save(seller=self.request.user)
 
 class StoreListView(generics.ListAPIView):
     queryset = get_all_stores()
