@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -12,8 +13,8 @@ class UserManager(BaseUserManager):
             raise ValueError("Users must have a username")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, role=role)
-        user.set_password(password)
+        hashed_password = make_password(password)
+        user = self.model(email=email, username=username, role=role, password=hashed_password)
         user.save(using=self._db)
         return user
 
