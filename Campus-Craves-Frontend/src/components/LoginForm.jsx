@@ -1,15 +1,42 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Forms.css";
 import Header from "./Header";
 
-const LoginForm = ({ title = "Login/SignUp", showStoreId, storeId, setStoreId }) => {
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (showStoreId) {
-      navigate("/productsview"); // Redirect to Products View for sellers
-    } else {
-      navigate("/"); // Redirect to Home page for buyers
+  const handleLogin = async () => {
+    try {
+      const loginResponse = await fetch("http://localhost:8000/users/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (!loginResponse.ok) {
+        setError(loginData.error || "Login failed.");
+        return;
+      }
+
+      localStorage.setItem("role", loginData.role);
+
+      // Redirect based on role
+      if (loginData.role === "seller") {
+        navigate("/sellerstores");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      setError("Something went wrong. Please try again.");
+      console.error("Login Error:", error);
     }
   };
 
@@ -17,32 +44,36 @@ const LoginForm = ({ title = "Login/SignUp", showStoreId, storeId, setStoreId })
     <div className="login">
       <Header />
       <div className="login-form">
-        <h2>{title}</h2>
-        <p>
-          Log In as <Link to="/buyer-login" className="login-link">Buyer</Link> | <Link to="/seller-login" className="login-link">Seller</Link>
-        </p>
+        <h2>{"Log in to Your Account"}</h2>
 
-        <input type="email" placeholder="Email" />
-        <input type="password" placeholder="Password" />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-        {showStoreId && (
-          <input
-            type="text"
-            placeholder="Store ID"
-            value={storeId}
-            onChange={(e) => setStoreId(e.target.value)}
-          />
-        )}
+        {error && <p className="error-message">{error}</p>}
 
-        <button className="login-button" onClick={handleLogin}>Login</button>
+        <button className="login-button" onClick={handleLogin}>
+          Login
+        </button>
 
         <p>
           Don't have an account?{" "}
-          <Link to="/sign-up" className="signup-link">Sign Up</Link>
+          <Link to="/sign-up" className="signup-link">
+            Sign Up
+          </Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default Login;
