@@ -3,15 +3,34 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Forms.css";
 
-const SignUp = ({ role, title = "Create New Account" }) => {
-  const [storeId, setStoreId] = useState(""); // Store ID for Seller
+const SignUp = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState(""); 
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSignUp = () => {
-    if (role === "seller") {
-      navigate("/productsview"); // Redirect to Products View for sellers
+  const handleSignUp = async () => {
+    const response = await fetch("http://localhost:8000/users/signup/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password, role }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log("User registered successfully:", data);
+      
+      if (role === "seller") {
+        navigate("/sellerstores");
+      } else {
+        navigate("/");
+      }
     } else {
-      navigate("/"); // Redirect to Home page for buyers
+      setError(data.error || "Registration failed.");
     }
   };
 
@@ -19,26 +38,20 @@ const SignUp = ({ role, title = "Create New Account" }) => {
     <div className="signup">
       <Header />
       <div className="signup-form">
-        <h2>{title}</h2>
-        Sign Up as <Link to="/buyer-signup" className="signup-link">Buyer</Link> | <Link to="/seller-signup" className="signup-link">Seller</Link>
+        <h2>{"Create New Account"}</h2>
+
+        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         
-        <input type="text" placeholder="Name" />
-        <input type="email" placeholder="Email" />
-        <input type="password" placeholder="Password" />
-        {role === "seller" && (
-          <input
-            type="text"
-            placeholder="Store ID"
-            value={storeId}
-            onChange={(e) => setStoreId(e.target.value)}
-          />
-        )}
+        <input type="text" placeholder="Role" value={role} onChange={(e) => setRole(e.target.value)} />
+      
+        {error && <p className="error">{error}</p>}
 
         <button className="signup-button" onClick={handleSignUp}>Sign Up</button>
-        
+
         <p>
-          Already have an account?{" "} 
-          <Link to="/login" className="login-link">Login</Link>
+          Already have an account? <Link to="/login" className="login-link">Login</Link>
         </p>
       </div>
     </div>
