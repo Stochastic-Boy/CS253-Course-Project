@@ -44,8 +44,14 @@ const SignUp = () => {
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         
-        <input type="text" placeholder="Role" value={role} onChange={(e) => setRole(e.target.value)} />
+        <select value={role} onChange={(e) => setRole(e.target.value)} required>
+          <option value="">Select Role</option>
+          <option value="buyer">buyer</option>
+          <option value="seller">seller</option>
+        </select>
+
       
+
         {error && <p className="error">{error}</p>}
 
         <button className="signup-button" onClick={handleSignUp}>Sign Up</button>
