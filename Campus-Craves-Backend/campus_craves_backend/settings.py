@@ -221,3 +221,8 @@ CACHES = {
         'LOCATION': 'redis://localhost:6379/1',
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
