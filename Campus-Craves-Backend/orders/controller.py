@@ -43,22 +43,3 @@ def cancel_order(order, user):
     order.status = "cancelled"
     order.save()
     return order, None
-
-
-def get_orders_by_seller(seller):
-    """Retrieve all orders for a seller's store."""
-    return Order.objects.filter(store__seller=seller).order_by('-created_at')
-
-def get_past_orders_by_seller(seller):
-    """Retrieve completed or canceled orders for a seller."""
-    return Order.objects.filter(store__seller=seller, status__in=["delivered", "cancelled"]).order_by('-created_at')
-
-def update_order_status_by_seller(order_id, status, seller):
-    """Allow sellers to update order status for their store's orders."""
-    try:
-        order = Order.objects.get(id=order_id, store__seller=seller)
-        order.status = status
-        order.save()
-        return order, None
-    except Order.DoesNotExist:
-        return None, "Order not found or unauthorized"
