@@ -28,12 +28,15 @@ def home(request):
 class RegisterUser(APIView):
     def post(self, request):
         role = request.data.get('role')
+        password = request.data.get('password')
+        email = request.data.get('email') 
+        username = request.data.get('username')
         if role not in ["buyer", "seller"]:
             return Response({"error": "Invalid role specified."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            user = User.objects.create_user(email=email, username=username, password=password, role=role)
             if role == "buyer":
                 BuyerProfile.objects.create(user=user)
             else:
