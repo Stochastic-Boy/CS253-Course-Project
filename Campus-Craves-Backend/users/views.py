@@ -16,7 +16,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .controller import get_user_by_email, create_user, authenticate_user
+from rest_framework.permissions import AllowAny
 import json
+
 
 # Generate OTP Dictionary (Temporary storage)
 OTP_STORAGE = {}
@@ -26,6 +28,7 @@ def home(request):
 
 # User Registration (Buyer/Seller)
 class RegisterUser(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         role = request.data.get('role')
         password = request.data.get('password')
@@ -46,6 +49,7 @@ class RegisterUser(APIView):
 
 # User Login
 class LoginUser(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')

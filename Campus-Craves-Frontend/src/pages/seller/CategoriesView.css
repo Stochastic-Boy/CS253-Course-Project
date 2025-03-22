@@ -162,31 +162,3 @@
   align-items: center;
   justify-content: center;
 }
-
-/* Add background images for each category type */
-.category-type-button.Snacks-Veg {
-  background-image: url('/assets/pasta.jpg'); /* Add your image URL here */
-}
-
-.category-type-button.Snacks-Non-veg {
-  background-image: url('/assets/snacksnvg.jpg'); /* Add your image URL here */
-}
-
-.category-type-button.Main-Course-Veg {
-  background-image: url('/assets/maincourse2.jpg'); /* Add your image URL here */
-}
-
-.category-type-button.Main-Course-Non-Veg {
-  background-image: url('/assets/maincoursenvg.jpg'); /* Add your image URL here */
-}
-
-.category-type-button.Desserts {
-  background-image: url('/assets/deserts.jpg'); /* Add your image URL here */
-}
-
-.category-type-button.Beverages {
-  background-image: url('/assets/beverages.jpg'); 
-}
-.category-type-button.Packed-Food {
-    background-image: url('/assets/Packedfood1.jpg'); 
-  }
