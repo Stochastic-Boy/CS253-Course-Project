@@ -2,63 +2,62 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Forms.css";
-import axios from "axios";
 
 const SignUp = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState(""); 
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [data, setData] = useState({
-    username:"",
-    email:"", 
-    password:"",
-    role:"buyer",
-  })
 
   const handleSignUp = async () => {
+    if (!username || !email || !password || !role) {
+      setError("All fields are required!");
+      return;
+    }
+
     try {
-      const res = await axios.post('http://127.0.0.1:8000/users/signup/', data);
-      console.log('Registration successful:', res.data);
-      if(res.data) {
-        if (data.role === "seller") {
-          navigate("/productsview"); // Redirect to Products View for sellers
-        } else {
-            navigate("/"); // Redirect to Home page for buyers
-        }
+      const response = await fetch("http://localhost:8000/users/signup-otp/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate("/confirm-signup", { state: { email, role, username, password } });
+      } else {
+        setError(data.error || "Registration failed.");
       }
-    } catch (error) {
-      console.error('Registration failed:', error.response.data);
-      setError(error.response.data.message || "Registration failed. Please try again."); 
+    } catch (err) {
+      setError("Network error. Please try again later.");
+      console.error("Sign-up error:", err);
     }
   };
-
-  const handleChange=(e)=> {
-    setData({...data, [e.target.name]: e.target.value});
-  }
-
 
   return (
     <div className="signup">
       <Header />
       <div className="signup-form">
-        <h2>{"Create New Account"}</h2>
+        <h2>Create New Account</h2>
 
-        <input type="text" placeholder="Username" name="username" value={data.username} onChange={handleChange} />
-        <input type="email" placeholder="Email" name="email" value={data.email} onChange={handleChange} />
-        <input type="password" placeholder="Password" name="password" value={data.password} onChange={handleChange} />
-
-        <div className="buyer-radio flex">
-          <input className="w-auto mx-2" type="radio" id="buyer" name="role" value="buyer" onChange={handleChange} />
-          <label htmlFor="buyer">Buyer</label>
-        </div>
-        <div className="seller-radio flex">
-          <input className="w-auto mx-2" type="radio" id="seller" name="role" value="seller" onChange={handleChange} />
-          <label className="" htmlFor="seller">Seller</label>
-        </div>
+        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         
+        {/* Dropdown for Role instead of free text */}
+        <select value={role} onChange={(e) => setRole(e.target.value)} 
+        style={{ borderRadius: "5px", padding: "8px", marginBottom: "15px", width: "100%"}} >
+          <option value="">Select Role</option>
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+        </select>
       
         {error && <p className="error">{error}</p>}
 
-        <button className="signup-button" onClick={handleSignUp}>Sign Up</button>
+        <button className="signup-button" onClick={handleSignUp}>Verify and Sign Up</button>
 
         <p>
           Already have an account? <Link to="/login" className="login-link">Login</Link>
