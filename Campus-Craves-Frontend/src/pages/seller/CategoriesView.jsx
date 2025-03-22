@@ -59,39 +59,7 @@ const CategoriesView = () => {
         </div>
       </div>
       <div className="categories-content">
-        <div className="new-category-section">
-          <h2>Create New Category</h2>
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={newCategory.title}
-            onChange={handleInputChange}
-          />
-          <select name="type" value={newCategory.type} onChange={handleInputChange}>
-            <option value="Snacks Veg">Snacks Veg</option>
-            <option value="Snacks Non-veg">Snacks Non-veg</option>
-            <option value="Main Course Veg">Main Course Veg</option>
-            <option value="Main Course Non-Veg">Main Course Non-Veg</option>
-            <option value="Deserts">Deserts</option>
-            <option value="Beverages">Beverages</option> {/* Added Beverages */}
-          </select>
-          <input
-            type="text"
-            name="description"
-            placeholder="Description"
-            value={newCategory.description}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="price"
-            placeholder="Price"
-            value={newCategory.price}
-            onChange={handleInputChange}
-          />
-          <button onClick={addCategory} className="add-category-button">Add Category</button>
-        </div>
+
         <div className="existing-categories-section">
           <h2>Existing Categories</h2>
           <div className="category-type-container"> {/* Add a container for category type buttons */}
@@ -153,6 +121,41 @@ const CategoriesView = () => {
             ))}
           </div>
         </div>
+
+        <div className="new-category-section">
+          <h2>Create New Category</h2>
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={newCategory.title}
+            onChange={handleInputChange}
+          />
+          <select name="type" value={newCategory.type} onChange={handleInputChange}>
+            <option value="Snacks Veg">Snacks Veg</option>
+            <option value="Snacks Non-veg">Snacks Non-veg</option>
+            <option value="Main Course Veg">Main Course Veg</option>
+            <option value="Main Course Non-Veg">Main Course Non-Veg</option>
+            <option value="Deserts">Deserts</option>
+            <option value="Beverages">Beverages</option> {/* Added Beverages */}
+          </select>
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            value={newCategory.description}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="price"
+            placeholder="Price"
+            value={newCategory.price}
+            onChange={handleInputChange}
+          />
+          <button onClick={addCategory} className="add-category-button">Add Category</button>
+        </div>
+        
       </div>
     </div>
   );
