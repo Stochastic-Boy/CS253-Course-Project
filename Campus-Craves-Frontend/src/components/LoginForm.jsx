@@ -30,7 +30,7 @@ const Login = () => {
       localStorage.setItem("access_token", loginData.access_token);
       localStorage.setItem("refresh_token", loginData.refresh);
       localStorage.setItem("user", JSON.stringify(loginData.user || { email }));
-
+      localStorage.setItem("username", loginData.user.username)
       // Redirect based on role
       if (loginData.role === "seller") {
         navigate("/sellerstores");
