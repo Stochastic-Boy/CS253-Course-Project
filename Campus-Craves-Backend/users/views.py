@@ -19,6 +19,14 @@ from .controller import get_user_by_email, create_user, authenticate_user
 from rest_framework.permissions import AllowAny
 import json
 
+from django.conf import settings
+import random
+import sendgrid
+from sendgrid.helpers.mail import Mail
+from django.contrib.auth.hashers import make_password
+
+# Load SendGrid API Key 
+SENDGRID_API_KEY = getattr(settings, "SENDGRID_API_KEY", None)
 
 # Generate OTP Dictionary (Temporary storage)
 OTP_STORAGE = {}
@@ -93,32 +101,106 @@ class UserProfile(RetrieveUpdateAPIView):
 class SendOTP(APIView):
     def post(self, request):
         email = request.data.get('email')
-        user = get_object_or_404(User, email=email)
+        user = get_user_by_email(email)
+        
+        if not user:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
         otp = random.randint(100000, 999999)
+        OTP_STORAGE[email] = otp  
+        
+        if not SENDGRID_API_KEY:
+            return Response({"error": "SendGrid API Key is missing."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        subject = "Campus Craves - Password Reset OTP"
+        body = f"Your OTP for password reset is: {otp}\n\nIf you did not request this, please ignore this email."
+
+        try:
+            sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+            message = Mail(
+                from_email="campus.craves.iitk@gmail.com",
+                to_emails=email,
+                subject=subject,
+                plain_text_content=body,
+            )
+            sg.send(message)
+            return Response({"message": "OTP sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Failed to send OTP. {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Send OTP for Email Verification at Signup
+class SignupOTP(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+
+        # Check if the email is already registered
+        user = get_user_by_email(email)
+        if user:
+            return Response({"error": "Email is already registered."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Generate OTP
+        otp = random.randint(100000, 999999)
         OTP_STORAGE[email] = otp  # Store OTP temporarily
+        print(f"OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
         
-        send_mail(
-            'Campus Craves - Password Reset OTP',
-            f'Your OTP for password reset is: {otp}',
-            'no-reply@campuscraves.com',
-            [email],
-            fail_silently=False,
-        )
+        if not SENDGRID_API_KEY:
+            return Response({"error": "SendGrid API Key is missing."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Create email content
+        subject = "Campus Craves - Email Verification OTP"
+        body = f"Your OTP for email verification is: {otp}\n\nPlease enter this OTP to complete your registration."
+
+        try:
+            sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+            
+            message = Mail(
+                from_email="campus.craves.iitk@gmail.com",
+                to_emails=email,
+                subject=subject,
+                plain_text_content=body,
+            )
+            
+            response = sg.send(message)
+            print(f"SendGrid Response: {response.status_code}, {response.body}")
+    
+            return Response({"message": "OTP sent successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Failed to send OTP. Error: {e}")
+            return Response({"error": f"Failed to send OTP. {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Verify OTP for Signup
+class VerifyOTP(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        otp = int(request.data.get('otp'))
+
+        print(f"Email: {email}, OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
         
-        return Response({"message": "OTP sent successfully."}, status=status.HTTP_200_OK)
+        if OTP_STORAGE.get(email) == otp:
+            OTP_STORAGE.pop(email)  # Remove OTP after use
+            return Response({"message": "OTP verified successfully."}, status=status.HTTP_200_OK)
+        
+        return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
 # Verify OTP & Reset Password
 class ResetPassword(APIView):
     def post(self, request):
         email = request.data.get('email')
         otp = int(request.data.get('otp'))
-        new_password = request.data.get('new_password')
+        new_password = request.data.get('newPassword')
 
         if OTP_STORAGE.get(email) == otp:
-            user = get_object_or_404(User, email=email)
-            user.set_password(new_password)
-            user.save()
+            user = get_user_by_email(email)
+            if not user:
+                return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            hashed_password = make_password(new_password)
+            print(f"New Password: {new_password}, Hashed Password: {hashed_password}")
+            if new_password is None:
+                    return Response({"error": "New password cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.password = hashed_password
+            user.save(using="default")
+            print(f"User Password Updated: {user.password}")
             OTP_STORAGE.pop(email)  # Remove OTP after use
             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
 
