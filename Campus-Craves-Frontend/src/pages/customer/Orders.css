@@ -45,6 +45,12 @@
   flex: 1;
   min-width: 150px;
   text-align: center;
+  border: 2px solid transparent;
+}
+.nav-button.active {
+  border-color: orange;
+  background-color: orange;
+
 }
 
 .orders-button {

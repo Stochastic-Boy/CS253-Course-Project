@@ -10,7 +10,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-
+    buyer = serializers.CharField(source="buyer.username", read_only=True)
     class Meta:
         model = Order
         fields = ['id', 'buyer', 'store', 'total_amount', 'payment_method', 'delivery_address', 'status', 'created_at', 'items']

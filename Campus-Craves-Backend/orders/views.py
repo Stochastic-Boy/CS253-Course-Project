@@ -17,7 +17,7 @@ class OrderListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(buyer=self.request.user).order_by('-created_at')
+        return Order.objects.order_by('-created_at')
 
 class OrderCreateView(APIView):
     """Create an order from the cart"""
