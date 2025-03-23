@@ -8,7 +8,7 @@ import SignUp from "./components/SignUp";
 import LoginForm from "./components/LoginForm";
 import ProductsView from "./pages/seller/sellerview/ProductsView";
 import OrdersView from "./pages/seller/OrdersView";
-import CategoriesView from "./pages/seller/CategoriesView";
+import CategoriesView from "./pages/seller/sellerview/CategoriesView";
 import SellerStores from "./pages/seller/SellerStores";
 import SellerView from "./pages/seller/sellerview/SellerView";
 

@@ -7,3 +7,5 @@ urlpatterns = [
     path('<int:store_id>/', StoreDetailView.as_view(), name='store-detail'),  # GET, PUT, DELETE /stores/<id>/
 ]
 
+
+
