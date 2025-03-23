@@ -12,28 +12,75 @@
   The seller can also navigate to the products view page by clicking on the store name.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 const SellerStores = () => {
+  const user = useSelector((state)=>state.user.user);
+  // console.log(user);
   const navigate = useNavigate();
   const [stores, setStores] = useState([
-    { id: 1, name: "Hall 6", description: "Awesome", location: "Health Centre, IIT Kanpur", status: "Open" },
-    { id: 2, name: "Hall 12", description: "Great", location: "Outskirts", status: "Open" }
+    // { id: 1, name: "Hall 6", description: "Awesome", location: "Health Centre, IIT Kanpur", status: "Open" },
+    // { id: 2, name: "Hall 12", description: "Great", location: "Outskirts", status: "Open" }
   ]);
   
-  const [newStore, setNewStore] = useState({ name: "", description: "", location: "", status: "" });
+  const [newStore, setNewStore] = useState({ name: "", description: "", location: "", status: "open" });
 
-  const handleAddStore = () => {
-    if (newStore.name && newStore.description && newStore.location && newStore.status) {
-      setStores([...stores, { id: Date.now(), ...newStore }]);
-      setNewStore({ name: "", description: "", location: "", status: "" });
+  const handleAddStore = async () => {
+    if (!newStore.name || !newStore.location || !newStore.status) {
+      setError("Name, location, and status are required.");
+      return;
+    }
+    // console.log(localStorage.getItem('access_token'))
+
+
+    try {
+      // Send a POST request to the backend
+      const response = await axios.post(
+        'http://127.0.0.1:8000/stores/create/',
+        newStore,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`, // Include the access token
+          },
+        }
+      );
+      console.log(response.data);
+
+      // If the store is created successfully, update the state
+      if (response.data) {
+        setStores([...stores, response.data]); // Add the new store to the list
+        setNewStore({ name: "", description: "", location: "", status: "open" }); // Reset the form
+        setError(""); // Clear any previous errors
+      }
+    } catch (error) {
+      console.error('Error creating store:', error);
+      setError(error.response?.data?.error || "Failed to create store. Please try again.");
     }
   };
 
   const handleDeleteStore = (id) => {
     setStores(stores.filter(store => store.id !== id));
   };
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/stores/', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
+        setStores(response.data); // Update the state with fetched stores
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+
+    fetchStores();
+  }, []); 
 
   return (
     <div className="store-management p-4">
@@ -57,12 +104,7 @@ const SellerStores = () => {
           value={newStore.location}
           onChange={(e) => setNewStore({ ...newStore, location: e.target.value })}
         />
-        <input
-          type="text"
-          placeholder="Status"
-          value={newStore.status}
-          onChange={(e) => setNewStore({ ...newStore, status: e.target.value })}
-        />
+        
         <button onClick={handleAddStore}>Add Store</button>
       </div>
 

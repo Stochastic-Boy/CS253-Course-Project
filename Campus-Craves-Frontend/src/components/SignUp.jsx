@@ -3,31 +3,35 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Forms.css";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { signUpSuccess, signUpFailure, signUpStart } from "../reduxfeatures/userSlice";
 
 const SignUp = () => {
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [data, setData] = useState({
-    username:"",
-    email:"", 
-    password:"",
-    role:"buyer",
-  })
+    username: '',
+    email: '',
+    password: '',
+    role: 'buyer',
+  });
 
   const handleSignUp = async () => {
+    dispatch(signUpStart());
     try {
       const res = await axios.post('http://127.0.0.1:8000/users/signup/', data);
       console.log('Registration successful:', res.data);
-      if(res.data) {
-        if (data.role === "seller") {
-          navigate("/productsview"); // Redirect to Products View for sellers
-        } else {
-            navigate("/"); // Redirect to Home page for buyers
-        }
+      dispatch(signUpSuccess(res.data)); // Save user data in Redux state
+      if (data.role === 'seller') {
+        navigate('/admin/productsview'); // Redirect to Products View for sellers
+      } else {
+        navigate('/'); // Redirect to Home page for buyers
       }
     } catch (error) {
       console.error('Registration failed:', error.response.data);
-      setError(error.response.data.message || "Registration failed. Please try again."); 
+      setError(error.response.data.message || 'Registration failed. Please try again.');
+      dispatch(signUpFailure(error.response.data.message));
     }
   };
 

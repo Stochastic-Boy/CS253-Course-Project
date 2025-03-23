@@ -4,13 +4,14 @@ from rest_framework.views import APIView
 from .models import Store
 from .serializers import StoreSerializer
 from .controller import create_store, get_all_stores, get_store_by_id, update_store, delete_store
+from rest_framework.permissions import AllowAny
 
 class StoreCreateView(generics.CreateAPIView):
     serializer_class = StoreSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        create_store(self.request.user, **serializer.validated_data)
+        serializer.save(seller=self.request.user)
 
 class StoreListView(generics.ListAPIView):
     queryset = get_all_stores()

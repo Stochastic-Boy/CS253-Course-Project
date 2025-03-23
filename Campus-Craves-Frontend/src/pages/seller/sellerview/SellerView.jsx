@@ -3,7 +3,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import { Navigate } from 'react-router-dom';
 import ProductsView from './ProductsView';
 import OrdersView from '../OrdersView';
-import CategoriesView from '../CategoriesView';
+import CategoriesView from './CategoriesView';
 import './SellerView.css'
 
 const SellerView = () => {

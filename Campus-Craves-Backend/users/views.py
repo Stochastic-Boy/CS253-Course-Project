@@ -29,22 +29,34 @@ def home(request):
 # User Registration (Buyer/Seller)
 class RegisterUser(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         role = request.data.get('role')
-        password = request.data.get('password')
-        email = request.data.get('email') 
-        username = request.data.get('username')
         if role not in ["buyer", "seller"]:
             return Response({"error": "Invalid role specified."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = User.objects.create_user(email=email, username=username, password=password, role=role)
+            user = serializer.save()  # Save the user
             if role == "buyer":
                 BuyerProfile.objects.create(user=user)
             else:
                 SellerProfile.objects.create(user=user)
-            return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
+
+            # Generate tokens for the newly registered user
+            refresh = RefreshToken.for_user(user)
+
+            # Serialize the user data
+            user_data = UserSerializer(user).data
+
+            # Return the response with tokens and user data
+            return Response({
+                "message": "User registered successfully.",
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
+                "user": user_data  # Include the full user data in the response
+            }, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # User Login
@@ -59,11 +71,12 @@ class LoginUser(APIView):
             login(request, user)
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
+            user_data = UserSerializer(user).data
             return Response({
                 "message": "Login successful.",
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),
-                "role": user.role
+                "user":user_data
             })
         return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 

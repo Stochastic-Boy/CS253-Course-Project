@@ -1,6 +1,7 @@
 import "./FoodGrid.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
+import axios from "axios";
 
 const FoodGrid = () => {
   const [stores, setStores] = useState([]); 
@@ -9,11 +10,22 @@ const FoodGrid = () => {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-    fetch("http://localhost:8000/stores/") 
-      .then(response => response.json())  
-      .then(data => setStores(data))  
-      .catch(error => console.error("Error fetching stores:", error));  
-  }, []);
+    const fetchStores = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/stores/', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
+        console.log(response.data)
+        setStores(response.data); // Update the state with fetched stores
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+
+    fetchStores();
+  }, []); 
 
   useEffect(() => {
     const updateGridSize = () => {
@@ -40,17 +52,18 @@ const FoodGrid = () => {
   return (
     <div className="food-grid-container">
       <div className="food-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-        {stores.slice(0, visibleItems).map((store) => (
+        {stores.slice(0, visibleItems).map((store, idx) => (
+          
           <div 
-            key={store.id} 
+            key={idx} 
             className="food-item" 
             onClick={() => navigate("/menu")} 
             style={{ cursor: "pointer" }} 
           >
             <img src={store.image || "/assets/canteenimg.png"} alt={store.name} className="food-image" />
             <div className="food-name">
-              <h5 style={{ color: "orange", marginBottom: 0 }}>Canteen</h5>
-              <h4>{store.name}</h4>
+              {/* <h5 style={{ color: "orange", marginBottom: 2 }}>Canteen</h5> */}
+              <h4 style={{ color: "white", marginBottom: 0 }}>{store.name}</h4>
             </div>
           </div>
         ))}

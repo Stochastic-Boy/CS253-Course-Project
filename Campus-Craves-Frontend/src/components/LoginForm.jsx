@@ -3,41 +3,35 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Forms.css";
 import Header from "./Header";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginFailure, loginStart, loginSuccess } from "../reduxfeatures/userSlice";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const [data, setData] = useState({email:"", password:""})
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent default form submission
 
+  const handleLogin = async () => {
+    dispatch(loginStart());
     try {
-      const loginResponse = await axios.post("http://127.0.0.1:8000/users/login/", data);
-
-      // Check if the response contains the expected data
-      if (loginResponse.data && loginResponse.data.role) {
-        localStorage.setItem("role", loginResponse.data.role); // Store role in localStorage
-
-        // Redirect based on role
-        if (loginResponse.data.role === "seller") {
-          navigate("/sellerstores");
-        } else {
-          navigate("/");
-        }
-      } else {
-        setError("Invalid response from server. Please try again.");
+      const res = await axios.post('http://127.0.0.1:8000/users/login/', data);
+      console.log('Login successful:', res.data);
+      dispatch(loginSuccess(res.data)); // Save user data in Redux state
+      if(res.data?.user.role=='seller') {
+        navigate('/admin/productsview'); //redirect to store management
+      }
+      else{ 
+        navigate('/'); // Redirect to Home page after login
       }
     } catch (error) {
-      // Handle errors from the server
-      if (error.response && error.response.data) {
-        setError(error.response.data.message || "Login failed. Please check your credentials.");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
-      console.error("Login Error:", error);
+      console.error('Login failed:', error.response.data);
+      setError(error.response.data.error || 'Login failed. Please try again.');
+      dispatch(loginFailure(error.response.data.error));
     }
   };
+
 
   const handleChange=(e)=> {
     setData({...data, [e.target.name]:e.target.value});
