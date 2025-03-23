@@ -29,6 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Store API key
+SENDGRID_API_KEY = "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"
+
 
 # Application definition
 
@@ -206,12 +209,14 @@ SWAGGER_SETTINGS = {
     },
 }
 
+# Email Configuration using SendGrid
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST = "smtp.sendgrid.net"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "siddharthpathak102002@gmail.com"  # Change to your Gmail
-EMAIL_HOST_PASSWORD = "huihuihui"  # Use an App Password, not your normal password
+EMAIL_HOST_USER = "apikey"  # SendGrid requires this as the username
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY  # Load from .env in production
+DEFAULT_FROM_EMAIL = "campus.craves.iitk@gmail.com"
 
 ASGI_APPLICATION = 'campus_craves_backend.asgi.application'
 
