@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../../components/Header";
 import "./Menu.css";
+
 
 
 const categories = ["Paneer", "Wraps", "Whoopers", "Pizzas", "Sandwiches", "Momos", "Noodles", "Pasta"];
@@ -44,6 +46,7 @@ const products = {
 };
 
 const Menu = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("Paneer");
   const [cart, setCart] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -139,7 +142,7 @@ const Menu = () => {
             <p style={{ color: "gray" }}>No items in cart</p>
           )}
           <div style={{ marginTop: "16px", fontWeight: "bold", textAlign: "right" }}>Total: ₹{total}</div>
-          <button style={{ width: "100%", background: "black", color: "white", padding: "8px", marginTop: "8px", border: "none", cursor: "pointer" }}>Checkout →</button>
+          <button onClick={()=>navigate("/checkout")} style={{ width: "100%", background: "black", color: "white", padding: "8px", marginTop: "8px", border: "none", cursor: "pointer" }} >Checkout →</button>
         </aside>
       </div>
     </div>
