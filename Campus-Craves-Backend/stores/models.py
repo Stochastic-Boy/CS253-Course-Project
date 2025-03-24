@@ -3,7 +3,7 @@ from users.models import User
 
 class Store(models.Model):
     """Model for a store managed by sellers"""
-    
+
     STATUS_CHOICES = (
         ('open', 'Open'),
         ('closed', 'Closed'),
@@ -13,9 +13,7 @@ class Store(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=255)
-    category = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='open')
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return f"{self.name} ({self.seller.username})"

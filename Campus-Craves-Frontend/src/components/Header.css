@@ -1,0 +1,50 @@
+.navbar{
+    background-color: rgb(57, 57, 57);
+    display: flex;
+    align-items: center;
+}
+
+.navlogo{
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.textlogo{
+    font-size: x-large;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.navbutton{
+    color: aliceblue;
+}
+
+.auth{
+    display: flex;
+    /* background-color: yellow; */
+    align-items: center;
+}
+
+.userAvatar{
+    font-size: larger;
+    font-weight: 600;
+    color: rgb(255, 242, 0);
+}
+
+.loginBtn{
+    background-color: rgb(241, 234, 34);
+    color: black;
+    padding-left: 25px;
+    padding-right: 25px;
+    border-radius: 10px;
+    margin-left: 10px;
+}

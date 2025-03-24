@@ -2,7 +2,6 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import "./Menu.css";
 
-
 const categories = ["Paneer", "Wraps", "Whoopers", "Pizzas", "Sandwiches", "Momos", "Noodles", "Pasta"];
 
 const products = {
@@ -148,3 +147,5 @@ const Menu = () => {
 }
 
 export default Menu;
+
+

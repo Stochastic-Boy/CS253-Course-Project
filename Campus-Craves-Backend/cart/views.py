@@ -19,7 +19,7 @@ class AddToCartView(APIView):
 
     def post(self, request):
         product_id = request.data.get("product_id")
-        quantity = request.data.get("quantity", 1)
+        quantity = request.data.get("quantity")
         cart_item = add_to_cart(request.user, product_id, quantity)
         if cart_item:
             return Response({"message": "Item added to cart", "cart_item": CartItemSerializer(cart_item).data})

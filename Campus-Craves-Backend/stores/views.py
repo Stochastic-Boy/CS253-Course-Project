@@ -10,7 +10,14 @@ class StoreCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        create_store(self.request.user, **serializer.validated_data)
+        data = self.request.data
+        create_store(
+            seller=self.request.user,
+            name=data.get('name'),
+            description=data.get('description'),
+            location=data.get('location'),
+            status=data.get('status', 'open')
+        )
 
 class StoreListView(generics.ListAPIView):
     queryset = get_all_stores()
@@ -28,7 +35,14 @@ class StoreDetailView(APIView):
     def put(self, request, store_id):
         store = get_store_by_id(store_id)
         if store and store.seller == request.user:
-            update_store(store, **request.data)
+            data = request.data
+            update_store(
+                store,
+                name=data.get('name'),
+                description=data.get('description'),
+                location=data.get('location'),
+                status=data.get('status')
+            )
             return Response({"message": "Store updated"})
         return Response({"error": "Unauthorized or not found"}, status=403)
 

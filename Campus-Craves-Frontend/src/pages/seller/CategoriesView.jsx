@@ -1,162 +1,111 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './CategoriesView.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 
 const CategoriesView = () => {
+  const [categories, setCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState({ name: "" });
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [categories, setCategories] = useState({
-    
-    'Snacks Veg': [],
-    'Snacks Non-veg': [],
-    'Main Course Veg': [],
-    'Main Course Non-Veg': [],
-    'Desserts': [],
-    'Beverages': [], // Added Beverages
-    'Packed Food': []
-  });
 
-  const [newCategory, setNewCategory] = useState({
-    title: '',
-    type: 'Snacks Veg',
-    description: '',
-    price: ''
-  });
+  const user = useSelector((state) => state.user.user);
+  const accessToken = localStorage.getItem("access_token");
 
-  const [visibleCategory, setVisibleCategory] = useState(null); // State to track visible category
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/products/categories/", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewCategory({ ...newCategory, [name]: value });
+    fetchCategories();
+  }, [accessToken]);
+
+  const handleAddCategory = async () => {
+    if (!newCategory.name) {
+      setError("Category name is required.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/products/categories/",
+        newCategory,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setCategories([...categories, response.data]);
+      setNewCategory({ name: "" });
+      setError("");
+    } catch (error) {
+      console.error("Error creating category:", error);
+      setError("Failed to create category. Please try again.");
+    }
   };
 
-  const addCategory = () => {
-    setCategories({
-      ...categories,
-      [newCategory.type]: [...categories[newCategory.type], newCategory]
-    });
-    setNewCategory({ title: '', type: 'Snacks Veg', description: '', price: '' });
-  };
-
-  const [editableCategory, setEditableCategory] = useState(null);
-
-  const handleEditChange = (type, index, field, value) => {
-    const updatedCategories = { ...categories };
-    updatedCategories[type][index][field] = value;
-    setCategories(updatedCategories);
-  };
-
-  const toggleCategoryVisibility = (type) => {
-    setVisibleCategory(visibleCategory === type ? null : type);
+  const handleDeleteCategory = async (id) => {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/products/categories/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setCategories(categories.filter((category) => category.id !== id));
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
   };
 
   return (
-    <div className="categories-view-container">
-      <div className="top-bar">
-        <h1 className="website-name" onClick={() => navigate("/")}>CampusCrave</h1>
-        <div className="nav-buttons">
-          <button onClick={() => navigate("/ordersview")} className="nav-button">Orders</button>
-          <button onClick={() => navigate("/menu")} className="nav-button">Menu</button>
-        </div>
-      </div>
-      <div className="categories-content">
+    <div className="p-4">
+      <h2 className="text-xl font-semibold mb-2">Manage Categories</h2>
 
-        <div className="existing-categories-section">
-          <h2>Existing Categories</h2>
-          <div className="category-type-container"> {/* Add a container for category type buttons */}
-            {Object.keys(categories).map((type) => (
-              <div key={type} className="category-type">
-                <button
-                  className={`category-type-button ${type.replace(/\s+/g, '-')}`}
-                  onClick={() => toggleCategoryVisibility(type)}
-                >
-                  {type}
-                </button>
-                {visibleCategory === type && (
-                  <div className="category-list">
-                    {categories[type].map((category, index) => (
-                      <div key={index} className="category-item">
-                        <h3>{category.title}</h3>
-                        {editableCategory === `${type}-${index}` ? (
-                          <>
-                            <input
-                              type="text"
-                              value={category.description}
-                              onChange={(e) => handleEditChange(type, index, 'description', e.target.value)}
-                            />
-                            <input
-                              type="text"
-                              value={category.price}
-                              onChange={(e) => handleEditChange(type, index, 'price', e.target.value)}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <p>{category.description}</p>
-                            <p><strong>Rs. {category.price}</strong></p> {/* Make price bold */}
-                          </>
-                        )}
-                        <button
-                          onClick={() =>
-                            setEditableCategory(editableCategory === `${type}-${index}` ? null : `${type}-${index}`)
-                          }
-                          className="edit-category-button"
-                        >
-                          {editableCategory === `${type}-${index}` ? 'Save' : 'Edit'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            const updatedCategories = { ...categories };
-                            updatedCategories[type].splice(index, 1);
-                            setCategories(updatedCategories);
-                          }}
-                          className="delete-category-button"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="new-category-section">
-          <h2>Create New Category</h2>
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={newCategory.title}
-            onChange={handleInputChange}
-          />
-          <select name="type" value={newCategory.type} onChange={handleInputChange}>
-            <option value="Snacks Veg">Snacks Veg</option>
-            <option value="Snacks Non-veg">Snacks Non-veg</option>
-            <option value="Main Course Veg">Main Course Veg</option>
-            <option value="Main Course Non-Veg">Main Course Non-Veg</option>
-            <option value="Deserts">Deserts</option>
-            <option value="Beverages">Beverages</option> {/* Added Beverages */}
-          </select>
-          <input
-            type="text"
-            name="description"
-            placeholder="Description"
-            value={newCategory.description}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="price"
-            placeholder="Price"
-            value={newCategory.price}
-            onChange={handleInputChange}
-          />
-          <button onClick={addCategory} className="add-category-button">Add Category</button>
-        </div>
-        
+      <div className="mb-4">
+        <input
+          type="text"
+          className="border border-gray-400 px-2 py-1 mr-2"
+          placeholder="New Category Name"
+          value={newCategory.name}
+          onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+        />
+        <button className="bg-blue-500 text-white px-3 py-1" onClick={handleAddCategory}>
+          Add Category
+        </button>
+        {error && <p className="text-red-500 mt-1">{error}</p>}
       </div>
+
+      <ul>
+  {categories.map((category) => (
+    <li
+      key={category.id}
+      className="mb-1 flex justify-between border-b pb-1"
+    >
+      <span className="cursor-pointer text-blue-500 hover:underline"
+      onClick={() => navigate("/admin/productsview", { state: { categoryId: category.id } })}>
+        {category.name}
+      </span>
+      <button
+        className="text-sm text-red-500"
+        onClick={() => handleDeleteCategory(category.id)}
+      >
+        Delete
+      </button>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };

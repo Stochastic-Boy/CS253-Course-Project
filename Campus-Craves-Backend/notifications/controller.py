@@ -28,3 +28,5 @@ def delete_notification(notification_id):
         return True
     except ObjectDoesNotExist:
         return False
+
+

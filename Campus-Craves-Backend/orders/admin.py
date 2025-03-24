@@ -1,12 +1,9 @@
 from django.contrib import admin
-from .models import Order, OrderItem
+from .models import Order
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 1
-
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('buyer', 'store', 'total_amount', 'status', 'created_at')
-    inlines = [OrderItemInline]
-
-admin.site.register(Order, OrderAdmin)
+    list_display = ('id', 'user', 'product', 'quantity', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user_username', 'product_name')
+    ordering = ('-created_at',)
