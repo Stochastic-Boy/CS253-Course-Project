@@ -15,6 +15,8 @@ const CategoriesView = () => {
     'Packed Food': []
   });
 
+
+
   const [newCategory, setNewCategory] = useState({
     title: '',
     type: 'Snacks Veg',
@@ -54,7 +56,6 @@ const CategoriesView = () => {
       <div className="top-bar">
         <h1 className="website-name" onClick={() => navigate("/")}>CampusCrave</h1>
         <div className="nav-buttons">
-          <button onClick={() => navigate("/ordersview")} className="nav-button">Orders</button>
           <button onClick={() => navigate("/menu")} className="nav-button">Menu</button>
         </div>
       </div>
@@ -131,28 +132,7 @@ const CategoriesView = () => {
             value={newCategory.title}
             onChange={handleInputChange}
           />
-          <select name="type" value={newCategory.type} onChange={handleInputChange}>
-            <option value="Snacks Veg">Snacks Veg</option>
-            <option value="Snacks Non-veg">Snacks Non-veg</option>
-            <option value="Main Course Veg">Main Course Veg</option>
-            <option value="Main Course Non-Veg">Main Course Non-Veg</option>
-            <option value="Deserts">Deserts</option>
-            <option value="Beverages">Beverages</option> {/* Added Beverages */}
-          </select>
-          <input
-            type="text"
-            name="description"
-            placeholder="Description"
-            value={newCategory.description}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="price"
-            placeholder="Price"
-            value={newCategory.price}
-            onChange={handleInputChange}
-          />
+
           <button onClick={addCategory} className="add-category-button">Add Category</button>
         </div>
         
