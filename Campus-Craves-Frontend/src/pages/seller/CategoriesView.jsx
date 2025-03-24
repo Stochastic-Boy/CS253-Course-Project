@@ -56,7 +56,7 @@ const CategoriesView = () => {
       <div className="top-bar">
         <h1 className="website-name" onClick={() => navigate("/")}>CampusCrave</h1>
         <div className="nav-buttons">
-          <button onClick={() => navigate("/menu")} className="nav-button">Menu</button>
+          <button onClick={() => navigate("/sellermenu")} className="nav-button">Menu</button>
         </div>
       </div>
       <div className="categories-content">
