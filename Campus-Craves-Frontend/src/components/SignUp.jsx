@@ -2,39 +2,49 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "./Forms.css";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { signUpFailure, signUpStart } from "../reduxfeatures/userSlice";
 
 const SignUp = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState(""); 
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [data, setData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "buyer", // Default role set to 'buyer'
+  });
 
   const handleSignUp = async () => {
-    if (!username || !email || !password || !role) {
+    if (!data.username || !data.email || !data.password) {
       setError("All fields are required!");
       return;
     }
 
+    dispatch(signUpStart());
+
     try {
-      const response = await fetch("http://localhost:8000/users/signup-otp/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      // Step 1: Request OTP
+      const res = await axios.post("http://127.0.0.1:8000/users/signup-otp/", { email: data.email });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        navigate("/confirm-signup", { state: { email, role, username, password } });
+      if (res.status === 200) {
+        // Step 2: Navigate to Confirm Signup page with user details
+        navigate("/confirm-signup", { state: { ...data } });
       } else {
-        setError(data.error || "Registration failed.");
+        throw new Error("OTP request failed. Please try again.");
       }
     } catch (err) {
-      setError("Network error. Please try again later.");
-      console.error("Sign-up error:", err);
+      console.error("Registration failed:", err.response?.data || err.message);
+      const errorMessage = err.response?.data?.message || "Registration failed. Please try again.";
+      setError(errorMessage);
+      dispatch(signUpFailure(errorMessage));
     }
+  };
+
+  const handleChange = (e) => {
+    setData({ ...data, [e.target.name]: e.target.value });
   };
 
   return (
@@ -43,18 +53,22 @@ const SignUp = () => {
       <div className="signup-form">
         <h2>Create New Account</h2>
 
-        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        
-        {/* Dropdown for Role instead of free text */}
-        <select value={role} onChange={(e) => setRole(e.target.value)} 
-        style={{ borderRadius: "5px", padding: "8px", marginBottom: "15px", width: "100%"}} >
-          <option value="">Select Role</option>
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-        </select>
-      
+        <input type="text" placeholder="Username" name="username" value={data.username} onChange={handleChange} />
+        <input type="email" placeholder="Email" name="email" value={data.email} onChange={handleChange} />
+        <input type="password" placeholder="Password" name="password" value={data.password} onChange={handleChange} />
+
+        {/* Role Selection (Radio Buttons) */}
+        <div className="role-selection">
+          <label>
+            <input type="radio" name="role" value="buyer" checked={data.role === "buyer"} onChange={handleChange} />
+            Buyer
+          </label>
+          <label>
+            <input type="radio" name="role" value="seller" checked={data.role === "seller"} onChange={handleChange} />
+            Seller
+          </label>
+        </div>
+
         {error && <p className="error">{error}</p>}
 
         <button className="signup-button" onClick={handleSignUp}>Verify and Sign Up</button>

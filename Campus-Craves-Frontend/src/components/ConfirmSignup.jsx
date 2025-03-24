@@ -2,11 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import "./Forms.css";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { signUpSuccess, signUpFailure, signUpStart } from "../reduxfeatures/userSlice";
 
 const ConfirmSignup = () => {
-  const [error, setError] = useState("");
-  const location = useLocation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [error, setError] = useState("");
   const [otp, setOTP] = useState("");
 
   // Prevent crashes if location.state is undefined
@@ -17,62 +21,48 @@ const ConfirmSignup = () => {
 
   const handleResend = async () => {
     try {
-      const response = await fetch("http://localhost:8000/users/signup-otp/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await axios.post("http://localhost:8000/users/signup-otp/", { email });
 
-      const data = await response.json();
-      if (response.ok) {
-        console.log("OTP sent successfully:", data);
-      } else {
-        setError(data.error || "OTP resend failed.");
-      }
+      console.log("OTP resent successfully:", res.data);
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("OTP resend failed:", err.response?.data || err.message);
+      setError(err.response?.data?.error || "Failed to resend OTP. Try again.");
     }
   };
 
   const handleSignUp = async () => {
+    if (!otp) {
+      setError("OTP is required!");
+      return;
+    }
+
+    dispatch(signUpStart());
+
     try {
-      // First, verify the OTP
-      const otpResponse = await fetch("http://localhost:8000/users/verify-otp/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+      // Step 1: Verify OTP
+      await axios.post("http://localhost:8000/users/verify-otp/", { email, otp });
+
+      console.log("OTP verified successfully");
+
+      // Step 2: Register user
+      const res = await axios.post("http://localhost:8000/users/signup/", {
+        username,
+        email,
+        password,
+        role,
       });
 
-      const otpData = await otpResponse.json();
-      if (!otpResponse.ok) {
-        setError(otpData.error || "OTP verification failed.");
-        return;
-      }
+      console.log("User registered successfully:", res.data);
+      dispatch(signUpSuccess(res.data));
 
-      console.log("OTP verified successfully:", otpData);
+      // Step 3: Navigate based on role
+      navigate(role === "seller" ? "/sellerstores" : "/");
 
-      // Now, proceed with user registration
-      const signupResponse = await fetch("http://localhost:8000/users/signup/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, role }),
-      });
-
-      const signupData = await signupResponse.json();
-      if (signupResponse.ok) {
-        console.log("User registered successfully:", signupData);
-
-        // Redirect based on role
-        if(role === "seller") {
-          navigate("/sellerstores");
-        } else {
-            navigate("/");
-        }
-      } else {
-        setError(signupData.error || "Registration failed.");
-      }
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("Registration failed:", err.response?.data || err.message);
+      const errorMessage = err.response?.data?.error || "Registration failed. Try again.";
+      setError(errorMessage);
+      dispatch(signUpFailure(errorMessage));
     }
   };
 
@@ -84,7 +74,7 @@ const ConfirmSignup = () => {
         <h6>Enter the OTP sent to your registered email</h6>
         <h5>{email}</h5>
 
-        {/* OTP should be a number */}
+        {/* OTP Input */}
         <input
           type="number"
           placeholder="Enter OTP"
@@ -98,7 +88,7 @@ const ConfirmSignup = () => {
         <button className="signup-button" onClick={handleSignUp}>Sign Up</button>
 
         <p>
-          Didn't receive the email? {""}
+          Didn't receive the email?{" "}
           <Link onClick={handleResend} className="login-link">Click to resend</Link>
         </p>
 

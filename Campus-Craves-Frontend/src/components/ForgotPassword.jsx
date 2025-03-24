@@ -2,44 +2,44 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Forms.css";
 import Header from "./Header";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginFailure, loginStart, loginSuccess } from "../reduxfeatures/userSlice";
 
 const ForgotPassword = () => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); 
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setEmail(e.target.value);
+  };
+
   const handleContinue = async () => {
-    setError(""); 
+    dispatch(loginStart());
+    setError("");
     setSuccessMessage("");
 
     if (!email) {
       setError("Please enter your email.");
+      dispatch(loginFailure("Please enter your email."));
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:8000/users/send-otp/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
-        return;
-      }
-
-      setSuccessMessage("Check your email for reset instructions."); 
-
+      const response = await axios.post("http://localhost:8000/users/send-otp/", { email });
+      setSuccessMessage("Check your email for reset instructions.");
+      dispatch(loginSuccess(response.data));
+      
       setTimeout(() => {
         navigate("/reset-password", { state: { email } });
-      }, 2000); 
+      }, 2000);
     } catch (error) {
-      setError("Something went wrong. Please try again.");
-      console.error("Forgot Password Error:", error);
+      console.error("Forgot Password Error:", error.response?.data || error);
+      setError(error.response?.data?.error || "Something went wrong. Please try again.");
+      dispatch(loginFailure(error.response?.data?.error || "Something went wrong."));
     }
   };
 
@@ -52,13 +52,14 @@ const ForgotPassword = () => {
         <input
           type="email"
           placeholder="Email"
+          name="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+          onChange={handleChange}
         />
 
         {error && <p className="error-message">{error}</p>}
-        {successMessage && <p className="success-message">{successMessage}</p>} 
+        {successMessage && <p className="success-message">{successMessage}</p>}
+        
         <button className="login-button" onClick={handleContinue}>
           Continue
         </button>
@@ -74,3 +75,4 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+

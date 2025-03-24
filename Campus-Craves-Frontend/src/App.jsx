@@ -9,9 +9,6 @@ import Login from "./components/LoginForm";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import ConfirmSignup from "./components/ConfirmSignup";
-import ProductsView from "./pages/seller/sellerview/ProductsView";
-import OrdersView from "./pages/seller/OrdersView";
-import CategoriesView from "./pages/seller/CategoriesView";
 import SellerStores from "./pages/seller/SellerStores";
 import SellerView from "./pages/seller/sellerview/SellerView";
 
