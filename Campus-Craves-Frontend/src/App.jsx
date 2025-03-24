@@ -11,6 +11,8 @@ import OrdersView from "./pages/seller/OrdersView";
 import CategoriesView from "./pages/seller/CategoriesView";
 import SellerStores from "./pages/seller/SellerStores";
 import SellerView from "./pages/seller/sellerview/SellerView";
+import Checkout from "./pages/customer/CheckoutPage";
+import SellerMenu from "./pages/seller/SellerMenu";
 
 const App = () => {
   return (
@@ -18,6 +20,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
+        <Route path="/sellermenu" element={<SellerMenu />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/offers" element={<Offers />} />
         <Route path="/canteens" element={<Canteens />} />
         <Route path="/order" element={<Orders />} />
@@ -28,6 +32,7 @@ const App = () => {
         <Route path="/productsview" element={<ProductsView />} />
         <Route path="/categoriesview" element={<CategoriesView />} />
         <Route path="/ordersview" element={<OrdersView />} />
+        <Route path="/sellersview" element={<SellerView />} />
       </Routes>
     </Router>
   );
