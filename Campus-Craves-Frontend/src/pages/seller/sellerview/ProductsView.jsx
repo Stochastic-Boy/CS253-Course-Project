@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./ProductsView.css"; // Import CSS file for styling
 import { Link } from "react-router-dom";
 
+const categories = ["Paneer", "Wraps", "Whoopers", "Pizzas", "Sandwiches", "Momos", "Noodles", "Pasta"];
+
 export default function ProductsView() {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({ title: "", category: "", price: "" });
@@ -28,8 +30,7 @@ export default function ProductsView() {
   };
 
   return (
-
-  <div className="dashboard-container">
+    <div className="dashboard-container">
       {/* Main Content */}
       <div className="main-content">
         {/* Product List */}
@@ -53,40 +54,43 @@ export default function ProductsView() {
                   </label>
                   <span className="stock-text">{product.inStock ? "In Stock" : "Out of Stock"}</span>
                 </span>
-
               </div>
             ))}
           </div>
         </div>
     
+        {/* New Product Form */}
+        <div className="new-product-form">
+          <h2>New Product</h2>
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={newProduct.title}
+            onChange={handleChange}
+          />
+          
+          {/* Category Dropdown */}
+          <select name="category" value={newProduct.category} onChange={handleChange}>
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
 
-     {/* New Product Form */}
-    <div className="new-product-form">
-      <h2>New Product</h2>
-      <input
-        type="text"
-        name="title"
-        placeholder="Title"
-        value={newProduct.title}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        name="category"
-        placeholder="Category"
-        value={newProduct.category}
-        onChange={handleChange}
-      />
-      <input
-        type="number"
-        name="price"
-        placeholder="Price"
-        value={newProduct.price}
-        onChange={handleChange}
-      />
-      <button onClick={addProduct}>Create</button>
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={newProduct.price}
+            onChange={handleChange}
+          />
+          
+          <button onClick={addProduct}>Create</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   );
 }
