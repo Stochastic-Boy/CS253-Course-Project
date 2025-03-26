@@ -1,0 +1,30 @@
+
+
+
+
+
+/* .hero-image {
+  width: 35vw;
+  display: block;
+  margin-left: auto;
+  margin-right: 10vw;
+  max-width: 300px; /* Prevents image from being too large on small screens */
+/* } */
+
+
+
+  /* .hero-image {
+    width: 40vw; /* Slightly larger on medium screens */
+    /* max-width: 250px; */
+  /* } */ 
+
+/* .hero-image {
+    width: 50vw;
+    max-width: 220px;
+    margin: 0 auto;
+  } */
+
+/* .hero-image {
+    width: 70vw;
+    max-width: 180px;
+  } */
