@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const CategoriesView = () => {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ name: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const { sellerId } = useParams();
 
   const user = useSelector((state) => state.user.user);
   const accessToken = localStorage.getItem("access_token");
@@ -92,7 +94,7 @@ const CategoriesView = () => {
       className="mb-1 flex justify-between border-b pb-1"
     >
       <span className="cursor-pointer text-blue-500 hover:underline"
-      onClick={() => navigate(`/seller/productsview/${category.id}`)}>
+      onClick={() => navigate(`/seller/${sellerId}/productsview/${category.id}`)}>
         {category.name}
       </span>
       <button
