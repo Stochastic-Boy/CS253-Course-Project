@@ -11,13 +11,15 @@ import ResetPassword from "./components/ResetPassword";
 import ConfirmSignup from "./components/ConfirmSignup";
 import SellerStores from "./pages/seller/SellerStores";
 import SellerView from "./pages/seller/sellerview/SellerView";
+import CartPage from "./pages/customer/CartPage";
+import CheckoutPage from "./pages/customer/CheckoutPage";
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/menu" element={<Menu />} />
+        <Route path="/menu/:storeId" element={<Menu />} />
         <Route path="/offers" element={<Offers />} />
         <Route path="/canteens" element={<Canteens />} />
         <Route path="/order" element={<Orders />} />
@@ -28,6 +30,8 @@ const App = () => {
         <Route path="/confirm-signup" element={<ConfirmSignup />} />
         <Route path="/admin/*" element={<SellerView/>} />
         <Route path="/sellerstores" element={<SellerStores />} />
+        <Route path="/cart/:storeId" element={<CartPage />} />
+        <Route path="/checkout/:storeId" element={<CheckoutPage />} />
       </Routes>
     </Router>
   );

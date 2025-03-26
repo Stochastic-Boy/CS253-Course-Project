@@ -1,151 +1,151 @@
-import { useState } from "react";
-import Header from "../../components/Header";
-import "./Menu.css";
-
-const categories = ["Paneer", "Wraps", "Whoopers", "Pizzas", "Sandwiches", "Momos", "Noodles", "Pasta"];
-
-const products = {
-  Paneer: [
-    { id: 1, name: "Paneer Tikka", price: 120 },
-    { id: 2, name: "Paneer Butter Masala", price: 150 },
-    { id: 3, name: "Paneer Kathi Roll", price: 100 },
-    { id: 4, name: "Paneer Pakora", price: 80 },
-  ],
-  Wraps: [
-    { id: 5, name: "Veg Wrap", price: 90 },
-    { id: 6, name: "Chicken Wrap", price: 140 },
-  ],
-  Whoopers: [
-    { id: 7, name: "Classic Whooper", price: 160 },
-    { id: 8, name: "Cheese Whooper", price: 180 },
-  ],
-  Pizzas: [
-    { id: 9, name: "Margherita Pizza", price: 200 },
-    { id: 10, name: "BBQ Chicken Pizza", price: 250 },
-    { id: 11, name: "Veggie Supreme", price: 220 },
-  ],
-  Sandwiches: [
-    { id: 12, name: "Grilled Cheese Sandwich", price: 80 },
-    { id: 13, name: "Chicken Club Sandwich", price: 150 },
-  ],
-  Momos: [
-    { id: 14, name: "Veg Momos", price: 70 },
-    { id: 15, name: "Chicken Momos", price: 120 },
-  ],
-  Noodles: [
-    { id: 16, name: "Hakka Noodles", price: 110 },
-    { id: 17, name: "Schezwan Noodles", price: 130 },
-  ],
-  Pasta: [
-    { id: 18, name: "White Sauce Pasta", price: 140 },
-    { id: 19, name: "Red Sauce Pasta", price: 130 },
-  ],
-};
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Menu = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Paneer");
-  const [cart, setCart] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
+  // Matches /menu/:storeId in your routes
+  const { storeId } = useParams();
+  const navigate = useNavigate();
+  // Buyer must be logged in to add items to cart
+  const accessToken = localStorage.getItem("access_token");
 
-  const handleAddToCart = (item) => {
-    setCart((prev) => ({
-      ...prev,
-      [item.id]: { ...item, quantity: (prev[item.id]?.quantity || 0) + 1 },
-    }));
+  // State for store categories, selected category, products, etc.
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [quantities, setQuantities] = useState({});
+  const [message, setMessage] = useState("");
+
+  // Fetch all categories for the given store once storeId is available
+  useEffect(() => {
+    if (!storeId) return;
+    fetchCategories();
+  }, [storeId]);
+
+  // 1) Load categories via: GET /products/public/categories/<store_id>/
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/products/public/categories/${storeId}/`);
+      setCategories(res.data); // Save them in state
+    } catch (err) {
+      console.error("Error fetching categories:", err.response?.data || err.message);
+    }
   };
 
-  const handleQuantityChange = (id, change) => {
-    setCart((prev) => {
-      const newQuantity = (prev[id]?.quantity || 0) + change;
-      if (newQuantity <= 0) {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [id]: { ...prev[id], quantity: newQuantity } };
-    });
+  // 2) Load products in a selected category via: GET /products/public/products/<store_id>/<category_id>/
+  const fetchProducts = async (categoryId) => {
+    try {
+      const res = await axios.get(
+        `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
+      );
+      setProducts(res.data);
+      setSelectedCategory(categoryId);
+    } catch (err) {
+      console.error("Error fetching products:", err.response?.data || err.message);
+    }
   };
 
-  const total = Object.values(cart).reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // 3) Add a product to cart, requires a valid JWT
+  const handleAddToCart = async (productId) => {
+    if (!accessToken) {
+      alert("Please log in first!");
+      return;
+    }
 
-  const filteredProducts = searchTerm
-    ? Object.values(products).flat().filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : products[selectedCategory] || [];
+    // Default to quantity=1 if none is set
+    const quantity = quantities[productId] || 1;
+    try {
+      await axios.post(
+        "http://127.0.0.1:8000/cart/add/",
+        { product_id: productId, quantity },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setMessage("Added to cart!");
+      setTimeout(() => setMessage(""), 2000);
+      navigate(`/cart/${storeId}`);
+    } catch (err) {
+      console.error("Error adding to cart:", err.response?.data || err.message);
+    }
+  };
 
   return (
-    <div className="orgmenu">
-    <Header/>
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", padding: "16px", background: "#f7f7f7" }}>
-      <style>
-        {`
-          @media (min-width: 768px) {
-            .layout { display: flex; flex-direction: row; }
-            .sidebar { width: 16%; }
-            .content { flex: 1; }
-            .cart { width: 25%; }
-          }
-        `}
-      </style>
-      
-      <div className="layout">
-        {/* Sidebar */}
-        <aside className="sidebar" style={{ background: "white", padding: "16px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>Categories</h2>
-          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} style={{ width: "100%", padding: "8px", marginBottom: "8px" }}>
-            {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Menu</h2>
+
+      {message && <p className="text-green-600">{message}</p>}
+
+      {/* Category List */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Categories</h3>
+        {/* If no categories found, show a message */}
+        {categories.length === 0 ? (
+          <p>No categories found for this store.</p>
+        ) : (
+          <ul className="pl-4">
+            {categories.map((cat) => (
+              <li
+                key={cat.id}
+                className={`cursor-pointer py-1 ${
+                  selectedCategory === cat.id ? "font-bold text-blue-600" : ""
+                }`}
+                onClick={() => fetchProducts(cat.id)}
+              >
+                {cat.name}
+              </li>
             ))}
-          </select>
-          <div>
-            {categories.map((category) => (
-              <button key={category} style={{ display: "block", width: "100%", padding: "8px", textAlign: "left", background: selectedCategory === category ? "#ff6600" : "white", color: selectedCategory === category ? "white" : "black", border: "none", cursor: "pointer" }} onClick={() => setSelectedCategory(category)}>
-                {category}
-              </button>
-            ))}
-          </div>
-        </aside>
-        
-        {/* Main Content */}
-        <div className="content" style={{ padding: "16px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>{selectedCategory}</h2>
-          <input type="text" placeholder="Search for items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: "100%", padding: "8px", marginBottom: "16px" }} />
-          <div style={{ background: "white", padding: "16px", borderRadius: "8px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
-            {filteredProducts.map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px", borderBottom: "1px solid #ddd" }}>
-                <span>{item.name}</span>
-                <span>₹{item.price}</span>
-                <button onClick={() => handleAddToCart(item)} style={{ background: "#ff6600", color: "white", padding: "4px 8px", border: "none", cursor: "pointer" }}>Add</button>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Cart */}
-        <aside className="cart" style={{ background: "white", padding: "16px", boxShadow: "0px 2px 4px rgba(0,0,0,0.1)" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>Items in Cart</h2>
-          {Object.values(cart).length > 0 ? (
-            Object.values(cart).map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px", borderBottom: "1px solid #ddd" }}>
-                <span>{item.name}</span>
-                <span>₹{item.price}</span>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <button onClick={() => handleQuantityChange(item.id, -1)} style={{ padding: "4px", background: "#ddd", border: "none", cursor: "pointer" }}>-</button>
-                  <span style={{ margin: "0 8px" }}>{item.quantity}</span>
-                  <button onClick={() => handleQuantityChange(item.id, 1)} style={{ padding: "4px", background: "#ddd", border: "none", cursor: "pointer" }}>+</button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p style={{ color: "gray" }}>No items in cart</p>
-          )}
-          <div style={{ marginTop: "16px", fontWeight: "bold", textAlign: "right" }}>Total: ₹{total}</div>
-          <button style={{ width: "100%", background: "black", color: "white", padding: "8px", marginTop: "8px", border: "none", cursor: "pointer" }}>Checkout →</button>
-        </aside>
+          </ul>
+        )}
       </div>
-    </div>
+
+      {/* Products for Selected Category */}
+      {selectedCategory && (
+        <div>
+          <h3 className="text-lg font-semibold border-b pb-1 mb-2">Products</h3>
+          {products.length === 0 ? (
+            <p>No products found in this category.</p>
+          ) : (
+            <ul>
+              {products.map((product) => (
+                <li key={product.id} className="flex justify-between items-center mb-3">
+                  <div>
+                    <p>{product.name}</p>
+                    <p className="text-sm text-gray-600">₹{product.price}</p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      min="1"
+                      className="w-16 border px-1"
+                      value={quantities[product.id] || 1}
+                      onChange={(e) =>
+                        setQuantities({
+                          ...quantities,
+                          [product.id]: parseInt(e.target.value),
+                        })
+                      }
+                    />
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 text-sm"
+                      onClick={() => handleAddToCart(product.id)}
+      
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default Menu;
-
-

@@ -1,78 +1,96 @@
-import { useNavigate } from "react-router-dom";
-import "./Orders.css";
+// Orders.jsx (Buyer Side)
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const Orders = () => {
-  const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const [message, setMessage] = useState("");
+  const token = localStorage.getItem("access_token");
 
-  const orders = [
-    {
-      id: 1,
-      items: [
-        { name: "Pizza", quantity: 2, price: 598 },
-        { name: "Burger", quantity: 1, price: 100 },
-      ],
-      total: 698,
-      date: "Jan 23, 2022 14:07",
-      address: "E-214, Hall of Residence 1",
-      payment: "Cash",
-      status: "Preparing",
-      canteen: "Hall 5", // Added canteen information
-    },
-    {
-      id: 2,
-      items: [{ name: "Pasta", quantity: 1, price: 250 }],
-      total: 250,
-      date: "Feb 10, 2022 18:30",
-      address: "B-12, Student Block",
-      payment: "Card",
-      status: "Delivered",
-      canteen: "Hall 6", // Added canteen information
-    },
-  ];
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/orders/myorders/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setOrders(res.data);
+    } catch (err) {
+      console.error("Error fetching orders", err);
+    }
+  };
+
+  const cancelOrder = async (orderId) => {
+    try {
+      const res = await axios.post(`http://127.0.0.1:8000/orders/cancel/${orderId}/`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMessage(res.data.message);
+      fetchOrders();
+    } catch (err) {
+      console.error("Error cancelling order", err);
+    }
+  };
+
+  const confirmDelivery = async (orderId) => {
+    try {
+      const res = await axios.post(`http://127.0.0.1:8000/orders/confirm/${orderId}/`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMessage(res.data.message);
+      fetchOrders();
+    } catch (err) {
+      console.error("Error confirming delivery", err);
+    }
+  };
 
   return (
-    <div className="order-history-container">
-      {/* Top Navigation */}
-      <div className="top-bar">
-        <h1 className="website-name" onClick={() => navigate("/")}>
-          CampusCrave
-        </h1>
-        
-      </div>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">My Orders</h2>
+      {message && <p className="text-green-600">{message}</p>}
+      {orders.map((order) => (
+        <div key={order.id} className="border rounded p-3 mb-4">
+          <p className="font-semibold">Order #{order.id}</p>
+          <p>Status: {order.status}</p>
+          <p>Payment: {order.payment_method}</p>
+          <p>Total: ₹{order.total_price}</p>
+          <p>Address: {order.delivery_address}</p>
+          <p>Date: {new Date(order.created_at).toLocaleString()}</p>
 
-      {/* Navigation Buttons */}
-      <div className="button-container">
-        <button onClick={() => navigate("/order")} className="nav-button orders-button">
-          Your Orders
-        </button>
-        <button onClick={() => navigate("/")} className="nav-button home-button">
-          Go to Home Page
-        </button>
-      </div>
-
-      {/* Order History Grid */}
-      <div className="order-grid">
-        {orders.map((order) => (
-          <div key={order.id} className="order-card">
-            <div className="order-header">
-              <h2 className="order-id">Order #{order.id}</h2>
-              <span className="order-date">{order.date}</span>
-            </div>
-            {order.items.map((item, index) => (
-              <p key={index} className="order-item">
-                <strong>{item.quantity} x {item.name}</strong> <span>Rs. {item.price}</span>
-              </p>
+          <ul className="ml-4 mt-2">
+            {order.items.map((item) => (
+              <li key={item.id}>
+                {item.product_details.name} × {item.quantity} = ₹{item.price * item.quantity}
+              </li>
             ))}
-            <p className="order-total"><strong>Total</strong> <span>Rs. {order.total}</span></p>
-            <p className="order-info"><strong>Delivery Address:</strong> {order.address}</p>
-            <p className="order-info"><strong>Paid by:</strong> {order.payment}</p>
-            <p className="order-info"><strong>Canteen:</strong> {order.canteen}</p> {/* Added Canteen Display */}
-            <p className={`order-status ${order.status.toLowerCase()}`}>
-              <strong>Order Status:</strong> {order.status}
-            </p>
-          </div>
-        ))}
-      </div>
+          </ul>
+
+          {order.status !== "delivered" && order.status !== "cancelled" && (
+            <div className="mt-2 space-x-2">
+              <button
+                onClick={() => cancelOrder(order.id)}
+                className="px-3 py-1 bg-red-500 text-white rounded"
+              >
+                Cancel Order
+              </button>
+              <button
+                onClick={() => confirmDelivery(order.id)}
+                className="px-3 py-1 bg-green-600 text-white rounded"
+              >
+                Confirm Delivery
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };

@@ -11,7 +11,8 @@ const FoodGrid = () => {
   useEffect(() => {
     fetch("http://localhost:8000/stores/") 
       .then(response => response.json())  
-      .then(data => setStores(data))  
+      .then(data => 
+        setStores(data))  
       .catch(error => console.error("Error fetching stores:", error));  
   }, []);
 
@@ -44,7 +45,7 @@ const FoodGrid = () => {
           <div 
             key={store.id} 
             className="food-item" 
-            onClick={() => navigate("/menu")} 
+            onClick={() => navigate(`/menu/${store.id}`)} 
             style={{ cursor: "pointer" }} 
           >
             <img src={store.image || "/assets/canteenimg.png"} alt={store.name} className="food-image" />

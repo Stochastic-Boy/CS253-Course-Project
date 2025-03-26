@@ -17,3 +17,5 @@ class Product(models.Model):
 
     def _str_(self):
         return self.name
+    
+# STOCK - FIELD 

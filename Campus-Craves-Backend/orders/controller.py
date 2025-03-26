@@ -1,93 +1,182 @@
-# # orders/controller.py
-# from django.core.exceptions import ObjectDoesNotExist
-# from .models import Order, OrderItem
-# from cart.models import Cart, CartItem
-# from products.models import Product
-# from notifications.controller import create_notification
+# orders/controller.py
+from .models import Order, OrderItem
+from cart.models import Cart, CartItem
+from notifications.controller import create_notification
+from rest_framework.response import Response
+from django.utils import timezone
 
-# def create_order(user, store, payment_method, delivery_address):
-#     """Create an order from cart items."""
-#     cart = Cart.objects.get(buyer=user, store=store)
-#     if not cart.cart_items.exists():
-#         return None, "Cart is empty"
+from rest_framework import status
+from django.conf import settings
+import sendgrid
+from sendgrid.helpers.mail import Mail
 
-#     total_price = sum(item.product.price * item.quantity for item in cart.cart_items.all())
+# Load SendGrid API Key 
+SENDGRID_API_KEY = getattr(settings, "SENDGRID_API_KEY", None)
+
+# def checkout_cart(user, store, payment_method, address):
+#     try:
+#         cart = Cart.objects.get(buyer=user, store=store)  # Fetch cart for the specific store
+#     except Cart.DoesNotExist:
+#         return None, "No cart found for this user at this store."
+
+#     cart_items = CartItem.objects.filter(cart=cart)
+#     if not cart_items.exists():
+#         return None, "Cart is empty."
+
+#     # Create order for the given store
 #     order = Order.objects.create(
-#         buyer=user,
+#         user=user,
 #         store=store,
-#         total_price=total_price,
 #         payment_method=payment_method,
-#         delivery_address=delivery_address
+#         delivery_address=address,
+#         total_price=sum(i.product.price * i.quantity for i in cart_items),
 #     )
 
-#     for cart_item in cart.cart_items.all():
+#     # Add items to the order
+#     for item in cart_items:
 #         OrderItem.objects.create(
 #             order=order,
-#             product=cart_item.product,
-#             quantity=cart_item.quantity,
-#             price=cart_item.product.price
+#             product=item.product,
+#             quantity=item.quantity,
+#             price=item.product.price
 #         )
 
-#     cart.cart_items.all().delete()
+#     # Clear the cart after successful order placement
+#     cart.items.all().delete()
 
-#     # Notify buyer
-#     create_notification(
-#         recipient=user,
-#         title="Order Placed",
-#         message=f"Your order #{order.id} has been successfully placed."
-#     )
+#     # Notifications
+#     create_notification(user, f"Order #{order.id} placed successfully.")
+#     create_notification(store.seller, f"New order from {user.username}.")
 
-#     # Notify seller
-#     create_notification(
-#         recipient=store.seller,
-#         title="New Order",
-#         message=f"You have a new order from {user.first_name}."
-#     )
+#     return [order], None  # Return the order in a list to match the original function's return type
 
-#     return order, None
 
-# def get_order_by_id(order_id):
-#     """Retrieve an order by ID."""
+# def cancel_order(user, order):
+#     if order.user != user:
+#         return False, "Unauthorized"
+#     if order.status == 'delivered':
+#         return False, "Cannot cancel a delivered order"
+
+#     order.status = 'cancelled'
+#     order.cancelled_at = timezone.now()
+#     order.save()
+
+#     message = "Your order was cancelled. "
+#     if order.payment_method == 'Razorpay':
+#         message += "Refund will be processed in 2 days."
+
+#     create_notification(user, message)
+#     create_notification(order.store.seller, f"Order #{order.id} was cancelled.")
+
 #     try:
-#         return Order.objects.get(id=order_id)
-#     except ObjectDoesNotExist:
-#         return None
+#         sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+#         message = Mail(
+#             from_email="campus.craves.iitk@gmail.com",
+#             to_emails=email,
+#             subject=subject,
+#             plain_text_content=body,
+#         )
+#         sg.send(message)
+#         return Response({"message": "Email sent successfully."}, status=status.HTTP_200_OK)
+#     except Exception as e:
+#         return Response({"error": f"Failed to send email. {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+  
 
-# def update_order_status(order, status, user):
-#     """Update order status, ensuring only store owners can change it."""
-#     if order.store.seller != user:
-#         return None, "Unauthorized"
-#     order.status = status
+# def mark_order_delivered(order, seller):
+#     if order.store.seller != seller:
+#         return False, "Unauthorized"
+
+#     order.status = "delivered"
+#     order.delivered_at = timezone.now()
 #     order.save()
 
-#     # Notify buyer
-#     create_notification(
-#         recipient=order.buyer,
-#         title="Order Status Updated",
-#         message=f"Your order #{order.id} status has been updated to {status}."
-#     )
+#     create_notification(order.user, f"Your order #{order.id} has been delivered!")
+#     return True, None
 
-#     return order, None
+def send_email(to_email, subject, body):
+    """Helper function to send email using SendGrid"""
+    try:
+        sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+        message = Mail(
+            from_email="campus.craves.iitk@gmail.com",
+            to_emails=to_email,
+            subject=subject,
+            plain_text_content=body,
+        )
+        sg.send(message)
+    except Exception as e:
+        print(f"Failed to send email to {to_email}: {str(e)}")  # Log the error
 
-# def cancel_order(order, user):
-#     """Allow a buyer to cancel an order if not yet dispatched."""
-#     if order.buyer != user:
-#         return None, "Unauthorized"
-#     if order.status in ["dispatched", "delivered"]:
-#         return None, "Cannot cancel order after dispatch"
-#     order.status = "cancelled"
-#     order.save()
+def checkout_cart(user, store, payment_method, address):
+    try:
+        cart = Cart.objects.get(buyer=user, store=store)  
+    except Cart.DoesNotExist:
+        return None, "No cart found for this user at this store."
 
-#     # Notify seller
-#     create_notification(
-#         recipient=order.store.seller,
-#         title="Order Cancelled",
-#         message=f"Order #{order.id} by {user.first_name} has been cancelled."
-#     )
+    cart_items = CartItem.objects.filter(cart=cart)
+    if not cart_items.exists():
+        return None, "Cart is empty."
 
-#     return order, None
+    total_price = sum(i.product.price * i.quantity for i in cart_items)
 
-from .models import Order
+    # Create order
+    order = Order.objects.create(
+        user=user,
+        store=store,
+        payment_method=payment_method,
+        delivery_address=address,
+        total_price=total_price,
+    )
 
-def get_user_orders(user):
-    return Order.objects.filter(user=user).order_by('-created_at')
+    # Add items to order
+    for item in cart_items:
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.product.price
+        )
+
+    # Clear the cart
+    cart.items.all().delete()
+
+    # Send email notifications
+    send_email(user.email, f"Order #{order.id} Placed!", "Your order has been successfully placed.")
+    send_email(store.seller.email, f"New Order from {user.username}", f"You have received a new order #{order.id}.")
+
+    return [order], None  
+
+
+def cancel_order(user, order):
+    if order.user != user:
+        return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+    if order.status == 'delivered':
+        return Response({"error": "Cannot cancel a delivered order"}, status=status.HTTP_400_BAD_REQUEST)
+
+    order.status = 'cancelled'
+    order.cancelled_at = timezone.now()
+    order.save()
+
+    # Email notifications
+    user_message = f"Your order #{order.id} was cancelled."
+    if order.payment_method == 'Razorpay':
+        user_message += " Refund will be processed in 2 days."
+
+    send_email(user.email, f"Order #{order.id} Cancelled", user_message)
+    send_email(order.store.seller.email, f"Order #{order.id} Cancelled", f"Order #{order.id} has been cancelled by the user.")
+
+    return Response({"message": "Order cancelled and notifications sent successfully."}, status=status.HTTP_200_OK)
+
+
+def mark_order_delivered(order, seller):
+    if order.store.seller != seller:
+        return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+
+    order.status = "delivered"
+    order.delivered_at = timezone.now()
+    order.save()
+
+    # Send email notification to user
+    send_email(order.user.email, f"Order #{order.id} Delivered", "Your order has been successfully delivered!")
+
+    return Response({"message": "Order marked as delivered and notification sent."}, status=status.HTTP_200_OK)
