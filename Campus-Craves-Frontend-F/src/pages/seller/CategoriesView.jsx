@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import './categoriesview.css';
 
 const CategoriesView = () => {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ name: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
 
   const { sellerId } = useParams();
 
@@ -15,6 +17,18 @@ const CategoriesView = () => {
   const accessToken = localStorage.getItem("access_token");
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/products/products/", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setProducts(res.data);
+        // console.log(res.data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+
     const fetchCategories = async () => {
       try {
         const response = await axios.get("http://127.0.0.1:8000/products/categories/", {
@@ -29,6 +43,7 @@ const CategoriesView = () => {
     };
 
     fetchCategories();
+    fetchProducts();
   }, [accessToken]);
 
   const handleAddCategory = async () => {
@@ -69,6 +84,8 @@ const CategoriesView = () => {
     }
   };
 
+  
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold mb-2">Manage Categories</h2>
@@ -89,21 +106,38 @@ const CategoriesView = () => {
 
       <ul>
   {categories.map((category) => (
-    <li
+    <div
       key={category.id}
-      className="mb-1 flex justify-between border-b pb-1"
+      className="category mb-4"
     >
-      <span className="cursor-pointer text-blue-500 hover:underline"
-      onClick={() => navigate(`/seller/${sellerId}/productsview/${category.id}`)}>
-        {category.name}
-      </span>
-      <button
-        className="text-sm text-red-500"
-        onClick={() => handleDeleteCategory(category.id)}
-      >
-        Delete
-      </button>
-    </li>
+      <div className="mb-1 flex justify-between border-b pb-1">
+        <span className="categoryName cursor-pointer">
+          {category.name}
+        </span>
+        <div className="category-btns">
+          <button 
+          onClick={() => navigate(`/seller/${sellerId}/productsview/${category.id}`)} 
+          className="text-sm text-yellow-500"
+          >
+            Add Product
+          </button>
+          <button
+            className="text-sm text-red-500"
+            onClick={() => handleDeleteCategory(category.id)}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      <div className="products">
+        {products.filter((product)=> product.category===category.id)
+        .map((product, index) => {
+          return (
+            <li key={index}>{product.name}</li>
+          )
+        })}
+      </div>
+    </div>
   ))}
 </ul>
 

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import AdminImage from '../../images/admin.png';
+import UserImage from '../../images/user.png';
+import './SellerProfile.css';
 
 const SellerProfileWithStores = () => {
   const user = useSelector((state) => state.user.user);
@@ -100,14 +103,14 @@ const SellerProfileWithStores = () => {
       <div style={{ position: "absolute", top: "20px", left: "20px", fontSize: "24px", fontWeight: "bold", color: "#ff9800" }}>Campus Craves</div>
       <div style={{ width: "350px", backgroundColor: "#333", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", textAlign: "center", padding: "20px" }}>
         <div style={{ backgroundColor: "#ff9800", height: "50px", borderTopLeftRadius: "10px", borderTopRightRadius: "10px" }}></div>
-        <img src={sellerData.image} alt="Owner" style={{ width: "80px", height: "80px", borderRadius: "50%", border: "3px solid #fff", marginTop: "-40px" }} />
+        <img src={AdminImage} alt="Owner" style={{ width: "80px", height: "80px", borderRadius: "50%", border: "3px solid #fff", marginTop: "-40px" }} />
         <h2>{sellerData.business_name}</h2>
         <p><strong>Contact:</strong> {sellerData.contact_number}</p>
         <p><strong>Location:</strong> {sellerData.location}</p>
       </div>
 
       <div className="store-management p-4" style={{ marginTop: "20px" }}>
-        <h2>Manage Stores</h2>
+        <h2 className="text-center">Manage Stores</h2>
         {stores.length === 0 ? (
           <div>
             <h3>No stores found. Create a new store:</h3>
@@ -119,11 +122,17 @@ const SellerProfileWithStores = () => {
         ) : (
           <ul>
             {stores.map((store) => (
-              <li key={store.id}>
-                <span>{store.name} - {store.description} - {store.location} - {store.status}</span>
-                <button onClick={() => setEditingStore(store.id)}>Edit</button>
+              <div key={store.id}>
+                <div className="mt-2 mb-4">
+                  <div className="storename">{store.name}</div>
+                  <div>{store.description}</div>
+                  <div>Location: {store.location}</div>
+                  <div>Status: {store.status}</div>
+                </div>
+                {/* <span>{store.name} - {store.description} - {store.location} - {store.status}</span> */}
+                <button className="mx-3" onClick={() => setEditingStore(store.id)}>Edit</button>
                 <button onClick={handleDeleteStore}>Delete</button>
-              </li>
+              </div>
             ))}
           </ul>
         )}
