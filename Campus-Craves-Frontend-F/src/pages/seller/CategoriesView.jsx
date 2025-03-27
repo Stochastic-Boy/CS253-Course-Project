@@ -98,7 +98,7 @@ const CategoriesView = () => {
           value={newCategory.name}
           onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
         />
-        <button className="bg-blue-500 text-white px-3 py-1" onClick={handleAddCategory}>
+        <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}} className="bg-blue-500 text-white px-3 py-1" onClick={handleAddCategory}>
           Add Category
         </button>
         {error && <p className="text-red-500 mt-1">{error}</p>}
@@ -110,18 +110,18 @@ const CategoriesView = () => {
       key={category.id}
       className="category mb-4"
     >
-      <div className="mb-1 flex justify-between border-b pb-1">
+      <div className="category-product-list mb-1 pb-1">
         <span className="categoryName cursor-pointer">
           {category.name}
         </span>
         <div className="category-btns">
-          <button 
+          <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
           onClick={() => navigate(`/seller/${sellerId}/productsview/${category.id}`)} 
           className="text-sm text-yellow-500"
           >
             Add Product
           </button>
-          <button
+          <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
             className="text-sm text-red-500"
             onClick={() => handleDeleteCategory(category.id)}
           >

@@ -18,3 +18,9 @@
   /* background-color: blue; */
   margin: 0 25px;
 }
+
+.category-product-list{
+  display: flex;
+  justify-content: space-between;
+  margin: 0px 10px;
+}

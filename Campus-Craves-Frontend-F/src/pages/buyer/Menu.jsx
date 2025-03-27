@@ -1,30 +1,41 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import Header from "../../components/Header";
+import "./Menu.css";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import "./Menu.css"
+import { useNavigate, useParams } from "react-router-dom";
 
 const Menu = () => {
+
   const { storeId } = useParams();
   const navigate = useNavigate();
-
   const accessToken = localStorage.getItem("access_token");
 
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [search, setSearch] = useState("");
+  const [newCategories, setNewCategories] = useState([]);
+  const [newSelectedCategory, setNewSelectedCategory] = useState("");
   const [products, setProducts] = useState([]);
-  const [quantities, setQuantities] = useState({});
   const [message, setMessage] = useState("");
+  const [newCart, setNewCart] = useState([]);
 
   useEffect(() => {
-    if (!storeId) return;
-    fetchCategories();
+    if (storeId) fetchCategories();
   }, [storeId]);
+
+  useEffect(() => {
+    if (newSelectedCategory) {
+      const selectedCategory = newCategories.find(cat => cat.name === newSelectedCategory);
+      if (selectedCategory) {
+        fetchProducts(selectedCategory.id);
+      }
+    }
+  }, [newSelectedCategory]);
 
   const fetchCategories = async () => {
     try {
       const res = await axios.get(`http://127.0.0.1:8000/products/public/categories/${storeId}/`);
-      setCategories(res.data); 
+      setNewCategories(res.data);
+      setNewSelectedCategory(res.data.length > 0 ? res.data[0].name : "");
     } catch (err) {
       console.error("Error fetching categories:", err.response?.data || err.message);
     }
@@ -36,23 +47,21 @@ const Menu = () => {
         `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
       );
       setProducts(res.data);
-      setSelectedCategory(categoryId);
     } catch (err) {
       console.error("Error fetching products:", err.response?.data || err.message);
     }
   };
 
-  const handleAddToCart = async (productId) => {
+  const addToCart = async (productId, quantityChange = 1) => {
     if (!accessToken) {
       alert("Please log in first!");
       return;
     }
-
-    const quantity = quantities[productId] || 1;
+  
     try {
       await axios.post(
         "http://127.0.0.1:8000/cart/add/",
-        { product_id: productId, quantity },
+        { product_id: productId, quantity: quantityChange }, // Send only product_id
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -60,73 +69,116 @@ const Menu = () => {
           },
         }
       );
-      setMessage("Added to cart!");
-      setTimeout(() => setMessage(""), 2000);
-      navigate(`/cart/${storeId}`);
+  
     } catch (err) {
-      console.error("Error adding to cart:", err.response?.data || err.message);
+      console.error("Error updating cart:", err.response?.data || err.message);
     }
+    fetchCart(); // Refresh cart after update
   };
+  
+  
+  
+
+  const fetchCart=async()=> {  // Move function outside if block
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/cart/${storeId}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(res.data); // Debugging
+      setNewCart(res.data); // Update state correctly
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  }
+
+  useEffect(() => {
+
+    if (accessToken && storeId) {
+      fetchCart(); // Call fetchCart inside useEffect correctly
+    }  
+  }, []); 
+  
+  
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <aside className="md:w-1/4">
-        <h2>Menu</h2>
-        {message && <p className="text-green-600">{message}</p>}
-        <div className="mb-6">
-          <h3>Categories</h3>
-          {categories.length === 0 ? (
-            <p>No categories found for this store.</p>
-          ) : (
-            <ul className="pl-4">
-              {categories.map((cat) => (
-                <li
-                  key={cat.id}
-                  className={`cursor-pointer py-1 ${selectedCategory === cat.id ? "font-bold text-blue-600" : ""}`}
-                  onClick={() => fetchProducts(cat.id)}
-                >
-                  {cat.name}
-                </li>
+    <div className="menupage">
+      <Header />
+      <div className="menu-container">
+        <aside className="menu-sidebar">
+          <h2>Categories</h2>
+
+          <ul>
+            {newCategories.map((category) => (
+              <li
+                key={category.id}
+                onClick={() => {
+                  setNewSelectedCategory(category.name);
+                  fetchProducts(category.id);
+                }}
+                className={category.name === newSelectedCategory ? "active" : ""}
+              >
+                {category.name}
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <main className="menu-main">
+          <h2>{newSelectedCategory}</h2>
+          <input
+            type="text"
+            placeholder="Search for items..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <div className="menu-items">
+            {products
+              .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+              .map((item, index) => (
+                <div key={index} className="menu-item">
+                  <span>{item.name} ₹{item.price}</span>
+                  <button onClick={() => addToCart(item.id, 1)}>Add</button>
+                </div>
               ))}
-            </ul>
-          )}
-        </div>
-      </aside>
-      
-      {selectedCategory && (
-        <div className="flex-1 bg-white p-4">
-          <h3 className="border-b">Products</h3>
-          {products.length === 0 ? (
-            <p>No products found in this category.</p>
-          ) : (
-            <ul>
-              {products.map((product) => (
-                <li key={product.id} className="flex justify-between items-center mt-4">
-                  <div>
-                    <p>{product.name}</p>
-                    <p className="text-sm text-gray-600">₹{product.price}</p>
+          </div>
+        </main>
+
+        <aside className="cart">
+          <h2 className="my-2">Items in Cart</h2>
+          
+          {newCart?.items?.length > 0 ? ( // Ensure newCart.items is defined
+            <div className="">
+              <div className="cart-items-heading">
+                <div>Product Name</div>
+                <div>Quantity</div>
+                <div>Price</div>
+              </div>
+              {newCart.items.map((item) => (
+                <div key={item.id} className="cart-items">
+                  <div>{item.product_name}</div>
+                  <div className="quantity">
+                    <div onClick={() => addToCart(item.product, 1)} className="plus">+</div>
+                    <div className="mx-2">{item.quantity}</div>
+                    <div onClick={() => addToCart(item.product, -1)} className="minus">-</div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      className="w-full md:w-1/6 p-2 border"
-                      value={quantities[product.id] || 1}
-                      onChange={(e) =>
-                        setQuantities({
-                          ...quantities,
-                          [product.id]: parseInt(e.target.value),
-                        })
-                      }
-                    />
-                    <button onClick={() => handleAddToCart(product.id)}>Add to Cart</button>
-                  </div>
-                </li>
+                  <div>₹{item.product_price * item.quantity}</div>
+                </div>
               ))}
-            </ul>
+            </div>
+          ) : (
+            <p>No items in cart</p>
           )}
-        </div>
-      )}
+
+          <h3 className="mt-4">Total: ₹{newCart?.total_price || 0}</h3>
+          <button onClick={()=>navigate(`/checkout/${storeId}`)} className="checkout">Checkout →</button>
+        </aside>
+
+
+      </div>
     </div>
   );
 };
