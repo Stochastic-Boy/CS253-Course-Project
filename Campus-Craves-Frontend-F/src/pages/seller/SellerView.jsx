@@ -15,17 +15,15 @@ const SellerView = () => {
   return (
     <div className='w-full h-screen' style={{ display: "grid", gridTemplateColumns: "300px 1fr" }}>
       <div className="sidebar gap-5 w-full">
-        <h2 className='text-white mt-4'>
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <h2 className='text-white mt-4' style={{ textDecoration: "none", color: "inherit" }}>
             Campus Craves
-          </Link>
         </h2>
         <Link to={`/seller/${sellerId}/ordersview`} className='sellerview-button'>Orders</Link>
         <Link to={`/seller/${sellerId}/categoriesview`} className='sellerview-button'>Catalog</Link>
         <Link to={`/seller/${sellerId}/sellerprofile`} className='sellerview-button'>Profile</Link>
         <Link to={`/`} onClick={()=>dispatch(logout())} className='sellerview-button logout-seller'>Logout</Link>
-
       </div>
+      
       <div>
         <Routes>
           <Route path="/" element={<Navigate to={`ordersview`} />} />
