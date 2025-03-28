@@ -6,7 +6,7 @@
   text-align: left;
   width: 100%;
   height: calc(100vh - 60px); /* Full height minus navbar height */
-  background-image: url('../images/homeImage.jpg');
+  background-image: url('../images/homeImage.jpg'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

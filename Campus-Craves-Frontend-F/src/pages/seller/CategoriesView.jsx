@@ -120,7 +120,7 @@ const CategoriesView = () => {
                 onClick={() => toggleCategory(category.id)}
               >
                 {category.name}
-                <span>{openCategory === category.id ? "▲" : "▼"}</span>
+                <span className="mx-2">{openCategory === category.id ? "▲" : "▼"}</span>
               </span>
 
               <div className="category-btns flex gap-2">

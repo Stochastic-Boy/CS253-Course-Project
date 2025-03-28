@@ -6,7 +6,8 @@
 
 .seller-orders-card{
   width: 40%;
-  background-color: rgb(159, 159, 159);
+  background-color: rgb(55, 55, 55);
+  color: aliceblue;
 }
 
 .orders-h1{

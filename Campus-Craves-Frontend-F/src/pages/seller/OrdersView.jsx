@@ -53,7 +53,7 @@ const OrdersView = () => {
         <div key={order.id} className="seller-orders-card border rounded p-3 mb-4">
           <div className="orders-h1">
             <p className="font-semibold">Order Number: {order.id}</p>
-            <h5 style={{color: order.status==='delivered' ? "green" : order.status==='pending' ? "rgb(255, 255, 0)" : "red"}}>{order.status}</h5>
+            <h5 style={{color: order.status==='delivered' ? "rgb(59, 255, 108)" : order.status==='pending' ? "rgb(255, 255, 0)" : "rgb(255, 53, 53)"}}>{order.status}</h5>
           </div>  
           <p>Buyer: {order.user}</p>
           <p>Payment: {order.payment_method}</p>
