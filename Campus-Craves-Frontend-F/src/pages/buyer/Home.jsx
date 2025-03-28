@@ -8,7 +8,7 @@ const Home = () => {
     <div className="page-content">
       <Header />
       <HomeImage />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

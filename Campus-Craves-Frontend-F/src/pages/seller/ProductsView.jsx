@@ -131,7 +131,7 @@ const ProductsView = () => {
           ))}
         </select>
 
-        <button className="bg-green-500 text-white px-3 py-1" onClick={handleAddProduct}>
+        <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}} className="bg-green-500 text-white px-3 py-1" onClick={handleAddProduct}>
           Add Product
         </button>
       </div>
@@ -140,12 +140,12 @@ const ProductsView = () => {
 
       <ul>
         {products.map((product) => (
-          <li key={product.id} className="border-b pb-1 mb-2 flex justify-between">
+          <li key={product.id} className="border-b pb-1 mb-2 mx-2 flex justify-between">
             <span>
               {product.name} - {product.description} - ₹{product.price} -{" "}
               {categories.find((cat) => cat.id === product.category)?.name || "Unknown"}
             </span>
-            <button
+            <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px', marginLeft: '20px'}}
               className="text-sm text-red-500"
               onClick={() => handleDeleteProduct(product.id)}
             >

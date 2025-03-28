@@ -26,22 +26,23 @@ const BuyerProfile = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUser({ ...user, [name]: value });
+        setUser({ ...user, [name]: value || "" });
     };
+    
 
     const toggleEdit = () => {
         if (isEditing) {
             fetch("http://127.0.0.1:8000/users/profile/", {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
-                }
-            }, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Accept": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 },
-                body: JSON.stringify(user),
+                body: JSON.stringify({
+                    phone_number: user.phone_number || "", // Ensures no null values
+                    address: user.address || "",          // Ensures no null values
+                }),
             })
                 .then((response) => response.json())
                 .then((data) => {
@@ -51,6 +52,7 @@ const BuyerProfile = () => {
         }
         setIsEditing(!isEditing);
     };
+    
 
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -149,7 +151,7 @@ const BuyerProfile = () => {
                 </div>
                 <div style={detailsStyle}>
                 <p>
-                        <strong>Phone Number:</strong>
+                        <strong>Phone Number: </strong>
                         {isEditing ? (
                             <input 
                                 type="text" 
@@ -163,7 +165,7 @@ const BuyerProfile = () => {
                         )}
                     </p>
                     <p>
-                        <strong>Current Address:</strong>
+                        <strong>Current Address: </strong>
                         {isEditing ? (
                             <input 
                                 type="text" 

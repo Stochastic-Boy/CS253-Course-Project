@@ -19,3 +19,10 @@
     text-decoration: none;
     font-size: larger;
 }
+
+.logout-seller{
+    background-color: rgb(255, 0, 0);
+    color: white;
+    margin-top: auto;
+    margin-bottom: 40px;
+}

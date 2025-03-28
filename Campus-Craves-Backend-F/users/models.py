@@ -62,13 +62,33 @@ class BuyerProfile(models.Model):
     def __str__(self):
         return f"Buyer Profile: {self.user.username}"
 
-# Seller Profile Model (Must be defined AFTER User)
+# # Seller Profile Model (Must be defined AFTER User)
+# class SellerProfile(models.Model):
+#     """Profile model for Sellers"""
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="seller_profile")
+#     business_name = models.CharField(max_length=255)
+#     contact_number = models.CharField(max_length=15)
+#     location = models.TextField()
+
+#     def __str__(self):
+#         return f"Seller Profile: {self.business_name} ({self.user.username})"
+
 class SellerProfile(models.Model):
     """Profile model for Sellers"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="seller_profile")
-    business_name = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=15)
-    location = models.TextField()
+
+    @property
+    def store(self):
+        return self.user.store
+
+    @property
+    def business_name(self):
+        return self.store.name if self.store else "No Store"
+
+    @property
+    def location(self):
+        return self.store.location if self.store else "No Location"
 
     def __str__(self):
         return f"Seller Profile: {self.business_name} ({self.user.username})"

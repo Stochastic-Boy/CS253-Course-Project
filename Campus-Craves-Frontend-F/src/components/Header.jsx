@@ -23,17 +23,17 @@ const Header = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
 
-            <Nav.Link className="navbutton" as={Link} to="/">Home</Nav.Link> 
+            <Nav.Link className="navbutton home-btn" as={Link} to="/">Home</Nav.Link> 
 
             <Nav.Link className="navbutton" as={Link} to="/canteens">Canteens</Nav.Link>
              <Nav.Link className="navbutton" as={Link} to="/order">Orders</Nav.Link>
              <div className="auth">
                {userData ? 
                <>
-                <Link to="/profile" className="userAvatar px-4">
-  {userData?.username}
-</Link>
-                <button onClick={()=>dispatch(logout())} className="logout">Logout</button>
+                <Nav.Link as={Link} to="/profile" className="navbutton userAvatar px-4">
+                  {userData?.username}
+                </Nav.Link>
+                <button onClick={()=>dispatch(logout())} className="user-logout-btn">Logout</button>
                </>
                :<Nav.Link className="loginBtn" as={Link} to="/login">Login</Nav.Link>
                }

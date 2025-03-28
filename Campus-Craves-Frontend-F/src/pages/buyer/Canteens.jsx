@@ -8,12 +8,11 @@ const Canteens = () => {
   return (
     <div>
       <Header/>
-      <HomeImage/>  
       <div className="food">
         <h2>Popular Canteens</h2>
         </div>
       <FoodGrid/>
-      <Footer/>
+      {/* <Footer/> */}
       
     </div>
   )

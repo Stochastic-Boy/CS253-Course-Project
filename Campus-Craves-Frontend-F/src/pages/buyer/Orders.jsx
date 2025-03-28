@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Header from "../../components/Header";
 import axios from "axios";
 
 const Orders = () => {
@@ -52,11 +53,22 @@ const Orders = () => {
   };
 
   return (
+    <div className="orders-page" >
+      <Header/>
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">My Orders</h2>
       {message && <p className="text-green-600">{message}</p>}
-      {orders.map((order) => (
-        <div key={order.id} className="border rounded p-3 mb-4">
+
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> */}
+      <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "16px",
+          }}
+        >
+       {orders.map((order) => (
+        <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)'}}>
           <p className="font-semibold">Order #{order.id}</p>
           <p>Status: {order.status}</p>
           <p>Payment: {order.payment_method}</p>
@@ -74,23 +86,26 @@ const Orders = () => {
 
           {order.status !== "delivered" && order.status !== "cancelled" && (
             <div className="mt-2 space-x-2">
-              <button
+              <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
                 onClick={() => cancelOrder(order.id)}
-                className="px-3 py-1 bg-red-500 text-white rounded"
+                className="px-3 mx-3 py-1 bg-red-500 text-white rounded"
               >
                 Cancel Order
               </button>
-              <button
+              <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
                 onClick={() => confirmDelivery(order.id)}
-                className="px-3 py-1 bg-green-600 text-white rounded"
+                className="px-3 mx-3 py-1 bg-green-600 text-white rounded"
               >
-                Confirm Delivery
+                Order Recieved
               </button>
             </div>
           )}
         </div>
       ))}
+      </div>
     </div>
+    </div>
+
   );
 };
 
