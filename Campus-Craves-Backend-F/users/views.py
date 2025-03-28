@@ -25,16 +25,14 @@ import sendgrid
 from sendgrid.helpers.mail import Mail
 from django.contrib.auth.hashers import make_password
 
-# Load SendGrid API Key 
 SENDGRID_API_KEY = getattr(settings, "SENDGRID_API_KEY", None)
 
-# Generate OTP Dictionary (Temporary storage)
 OTP_STORAGE = {}
 
 def home(request):
     return JsonResponse({"message": "Welcome to Campus Craves API!"})
 
-# User Registration (Buyer/Seller)
+# User Signup
 class RegisterUser(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -76,12 +74,11 @@ class LoginUser(APIView):
             login(request, user)
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
-            user_data = UserSerializer(user).data # a 
+            user_data = UserSerializer(user).data 
             return Response({
                 "message": "Login successful.",
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),
-                # s "role": user.role
                 "user" : user_data
             })
         return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -107,13 +104,10 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
             return get_object_or_404(BuyerProfile, user=self.request.user)
         return get_object_or_404(SellerProfile, user=self.request.user)
 
-    def perform_update(self, serializer):  # 🔥 Ensure `user` is set automatically
+    def perform_update(self, serializer):  
         serializer.save(user=self.request.user)
 
-
-
-
-
+        
 # Send OTP for Password Reset
 class SendOTP(APIView):
     def post(self, request):
@@ -150,20 +144,17 @@ class SignupOTP(APIView):
     def post(self, request):
         email = request.data.get('email')
 
-        # Check if the email is already registered
         user = get_user_by_email(email)
         if user:
             return Response({"error": "Email is already registered."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Generate OTP
         otp = random.randint(100000, 999999)
-        OTP_STORAGE[email] = otp  # Store OTP temporarily
+        OTP_STORAGE[email] = otp  
         print(f"OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
         
         if not SENDGRID_API_KEY:
             return Response({"error": "SendGrid API Key is missing."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Create email content
         subject = "Campus Craves - Email Verification OTP"
         body = f"Your OTP for email verification is: {otp}\n\nPlease enter this OTP to complete your registration."
 
@@ -194,7 +185,7 @@ class VerifyOTP(APIView):
         print(f"Email: {email}, OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
         
         if OTP_STORAGE.get(email) == otp:
-            OTP_STORAGE.pop(email)  # Remove OTP after use
+            OTP_STORAGE.pop(email)  
             return Response({"message": "OTP verified successfully."}, status=status.HTTP_200_OK)
         
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
@@ -218,7 +209,7 @@ class ResetPassword(APIView):
             user.password = hashed_password
             user.save(using="default")
             print(f"User Password Updated: {user.password}")
-            OTP_STORAGE.pop(email)  # Remove OTP after use
+            OTP_STORAGE.pop(email)  
             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
 
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
