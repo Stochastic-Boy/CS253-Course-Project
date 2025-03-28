@@ -2,16 +2,16 @@
     background-color: rgb(57, 57, 57);
     display: flex;
     align-items: center;
+    height: 60px;
 }
 
 .navlogo{
     display: flex;
     align-items: center;
-    height: 100%;
 }
 
 .textlogo{
-    font-size: x-large;
+    font-size: xx-large;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,6 +26,7 @@
 
 .navbutton{
     color: aliceblue;
+    font-size: x-large;
 }
 
 .auth{
@@ -35,7 +36,6 @@
 }
 
 .userAvatar{
-    font-size: larger;
     font-weight: 600;
     color: rgb(255, 242, 0);
 }
@@ -47,4 +47,16 @@
     padding-right: 25px;
     border-radius: 10px;
     margin-left: 10px;
+}
+
+.user-logout-btn{
+    background-color: rgb(255, 17, 0);
+    color: rgb(255, 255, 255);
+    padding-left: 25px;
+    padding-right: 25px;
+    border-radius: 5px;
+    margin-left: 10px;
+    border: none;
+    font-size: x-large;
+    display: flex;
 }

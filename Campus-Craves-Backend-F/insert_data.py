@@ -45,18 +45,6 @@ for phone, address, user_id in buyer_profiles:
         (phone, address, user_id),
     )
 
-seller_profiles = [
-    ('Hall 1 Canteen', '1112223333', 'Hall 1, IIT Kanpur', 3),
-    ('Hall 2 Canteen', '2223334444', 'Hall 2, IIT Kanpur', 5),
-    ('Hall 3 Canteen', '3334445555', 'Hall 3, IIT Kanpur', 7),
-]
-
-for business_name, contact_number, location, user_id in seller_profiles:
-    cursor.execute(
-        "INSERT INTO users_sellerprofile (business_name, contact_number, location, user_id) VALUES (?, ?, ?, ?)",
-        (business_name, contact_number, location, user_id),
-    )
-
 conn.commit()
 
 seller_ids = [3, 5, 7]  
@@ -72,6 +60,18 @@ for i, seller_id in enumerate(seller_ids):
     store_ids.append(cursor.lastrowid)
 
 conn.commit()
+
+seller_profiles = [
+    ('1112223333', 3),
+    ('2223334444', 5),
+    ('3334445555', 7),
+]
+
+for contact_number, user_id in seller_profiles:
+    cursor.execute(
+        "INSERT INTO users_sellerprofile (contact_number, user_id) VALUES (?, ?)",
+        (contact_number, user_id),
+    )
 
 food_categories = [
     "Bakery", "Beverages",

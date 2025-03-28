@@ -102,10 +102,14 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
             return BuyerProfileSerializer
         return SellerProfileSerializer
 
-    def get_object(self):  # 🔥 Fix: Override get_object to return current user's profile
+    def get_object(self):  
         if self.request.user.role == "buyer":
             return get_object_or_404(BuyerProfile, user=self.request.user)
         return get_object_or_404(SellerProfile, user=self.request.user)
+
+    def perform_update(self, serializer):  # 🔥 Ensure `user` is set automatically
+        serializer.save(user=self.request.user)
+
 
 
 

@@ -12,8 +12,21 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
   const [message, setMessage] = useState("");
   const accessToken = localStorage.getItem("access_token");
   const [newCart, setNewCart] = useState([]);
+  const [userDetails, setUserDetails] = useState({});
 
   useEffect(() => {
+    fetch("http://127.0.0.1:8000/users/profile/", {
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+      }
+  })
+      .then((response) => response.json())
+      .then((data) => {
+          setUserDetails({ id: data.id, phone_number: data.phone_number, address: data.address });
+      })
+      .catch((error) => {
+          console.error("Error fetching user data:", error);
+      });
 
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -44,7 +57,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
         body: JSON.stringify({
           store_id: storeId,
           payment_method: method,
-          delivery_address: deliveryAddress,
+          delivery_address: userDetails.address || "",
         }),
       });
 
@@ -63,6 +76,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
   };
 
   const handlePayment = () => {
+    console.log(userDetails)
     if (paymentMethod === "razorpay") {
       if (!window.Razorpay) {
         alert("Razorpay SDK failed to load.");
@@ -82,7 +96,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
         prefill: {
           name: `${user.username}`,
           email: `${user.email}`,
-          contact: "9999999999",
+          contact: ``,
         },
         theme: { color: "#ff6600" },
       };

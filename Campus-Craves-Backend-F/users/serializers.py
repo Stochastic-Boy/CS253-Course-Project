@@ -20,7 +20,8 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BuyerProfile
-        fields = '__all__'
+        fields = ["phone_number", "address"]  # 🔥 Exclude `user` from fields
+
 
 class SellerProfileSerializer(serializers.ModelSerializer):
     """Serializer for Seller Profile"""
