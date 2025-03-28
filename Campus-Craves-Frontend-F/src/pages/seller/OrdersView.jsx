@@ -5,6 +5,7 @@ import './Ordersview.css';
 const OrdersView = () => {
   const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState("");
+  const [visibleOrders, setVisibleOrders] = useState(10);
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -22,6 +23,10 @@ const OrdersView = () => {
     } catch (err) {
       console.error("Error fetching seller orders", err);
     }
+  };
+
+  const handleViewMore = () => {
+    setVisibleOrders((prev) => prev + 10);
   };
 
   // const markDelivered = async (orderId) => {
@@ -43,7 +48,8 @@ const OrdersView = () => {
       <h2 className="text-xl font-bold mb-4">Store Orders</h2>
       {message && <p className="text-green-600">{message}</p>}
       <div className="seller-orders">
-      {orders.map((order) => (
+
+       {orders.slice(0, visibleOrders).map((order) => (
         <div key={order.id} className="seller-orders-card border rounded p-3 mb-4">
           <div className="orders-h1">
             <p className="font-semibold">Order Number: {order.id}</p>
@@ -72,8 +78,20 @@ const OrdersView = () => {
             </button>
           )} */}
         </div>
-      ))}
+       ))}
       </div>
+
+      {/* View More Button */}
+    {orders.length > visibleOrders && (
+      <div className="text-center my-4">
+        <button
+          onClick={() => setVisibleOrders((prev) => prev + 10)}
+          className="bg-blue-500 text-black px-4 py-2 rounded hover:bg-blue-600"
+        >
+          View More
+        </button>
+      </div>
+    )}
     </div>
   );
 };

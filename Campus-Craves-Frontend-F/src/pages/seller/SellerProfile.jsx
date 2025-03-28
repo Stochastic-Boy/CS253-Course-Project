@@ -128,7 +128,7 @@ const SellerProfileWithStores = () => {
 
   return (
     <div style={{ height: "100vh", backgroundColor: "#2b2b2b", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
-      <div style={{ position: "absolute", top: "20px", left: "20px", fontSize: "24px", fontWeight: "bold", color: "#ff9800" }}>Campus Craves</div>
+      {/* <div style={{ position: "absolute", top: "20px", left: "20px", fontSize: "24px", fontWeight: "bold", color: "#ff9800" }}>Campus Craves</div> */}
       <div style={{ width: "350px", backgroundColor: "#333", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", textAlign: "center", padding: "20px" }}>
         <div style={{ backgroundColor: "#ff9800", height: "50px", borderTopLeftRadius: "10px", borderTopRightRadius: "10px" }}></div>
         <img src={AdminImage} alt="Owner" style={{ width: "80px", height: "80px", borderRadius: "50%", border: "3px solid #fff", marginTop: "-40px" }} />

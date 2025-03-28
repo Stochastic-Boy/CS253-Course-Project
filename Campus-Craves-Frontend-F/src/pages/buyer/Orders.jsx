@@ -53,13 +53,22 @@ const Orders = () => {
   };
 
   return (
-    <div className="orders-page">
+    <div className="orders-page" >
       <Header/>
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">My Orders</h2>
       {message && <p className="text-green-600">{message}</p>}
-      {orders.map((order) => (
-        <div key={order.id} className="border rounded p-3 mb-4">
+
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> */}
+      <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "16px",
+          }}
+        >
+       {orders.map((order) => (
+        <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)'}}>
           <p className="font-semibold">Order #{order.id}</p>
           <p>Status: {order.status}</p>
           <p>Payment: {order.payment_method}</p>
@@ -93,6 +102,7 @@ const Orders = () => {
           )}
         </div>
       ))}
+      </div>
     </div>
     </div>
 
