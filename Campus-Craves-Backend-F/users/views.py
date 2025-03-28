@@ -107,6 +107,7 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):  
         serializer.save(user=self.request.user)
 
+        
 # Send OTP for Password Reset
 class SendOTP(APIView):
     def post(self, request):

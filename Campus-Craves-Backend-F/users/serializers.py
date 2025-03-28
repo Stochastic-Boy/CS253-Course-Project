@@ -26,8 +26,9 @@ class BuyerProfileSerializer(serializers.ModelSerializer):
 class SellerProfileSerializer(serializers.ModelSerializer):
     """Serializer for Seller Profile"""
 
+    business_name = serializers.CharField(read_only=True)
+    location = serializers.CharField(read_only=True)
+
     class Meta:
         model = SellerProfile
-        fields = '__all__'
-
-
+        fields = ['id', 'user', 'contact_number', 'business_name', 'location']
