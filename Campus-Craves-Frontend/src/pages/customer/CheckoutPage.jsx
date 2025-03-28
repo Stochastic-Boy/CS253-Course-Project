@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -7,6 +8,8 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
   
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [message, setMessage] = useState("");
+  const accessToken = localStorage.getItem("access_token");
+  const [newCart, setNewCart] = useState([]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -33,7 +36,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           store_id: storeId,
@@ -46,7 +49,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
       
       if (res.ok) {
         setMessage("Order placed successfully!");
-        setTimeout(() => navigate("/order"), 2000); // Redirect after 2s
+        setTimeout(() => navigate("/order"), 1000); // Redirect after 2s
       } else {
         setMessage(data.error || "Order placement failed.");
       }
@@ -89,24 +92,58 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
     }
   };
 
+
+
+  useEffect(() => {
+
+    if (accessToken && storeId) {
+      fetchCart(); // Call fetchCart inside useEffect correctly
+    }  
+  }, []); 
+
+  
+  const fetchCart=async()=> {  // Move function outside if block
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/cart/${storeId}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(res.data); // Debugging
+      setNewCart(res.data); // Update state correctly
+      
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  }
+  
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div className="checkout-container" style={{width: "100vw"}}>
+
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", width: "40%" }}>
       <h2 style={{ borderBottom: "2px solid #ff6600", paddingBottom: "10px" }}>Checkout</h2>
 
       <div>
-        {items.map((item, index) => (
+        {newCart?.items?.length > 0 && (
+          <div>
+        {newCart.items.map((item, index) => (
           <div
             key={index}
             style={{ display: "flex", justifyContent: "space-between", margin: "10px 0" }}
           >
-            <span>{item.name}</span>
-            <span>₹{item.price} x {item.quantity}</span>
+            <span>{item.product_name}</span>
+            <span>₹{item.product_price} x {item.quantity}</span>
           </div>
         ))}
-        <h3 style={{ marginTop: "20px" }}>Total: ₹{computedTotalAmount}</h3>
+        </div>
+      )}
+        <h3 style={{ marginTop: "30px" }}>Total: ₹{newCart.total_price}</h3> 
       </div>
 
-      <div style={{ marginTop: "20px" }}>
+      <div style={{ marginTop: "40px" }}>
         <h3>Select Payment Method</h3>
         <label>
           <input
@@ -143,6 +180,8 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
 
       {message && <p style={{ marginTop: "15px", color: "green" }}>{message}</p>}
     </div>
+    </div>
+
   );
 };
 
