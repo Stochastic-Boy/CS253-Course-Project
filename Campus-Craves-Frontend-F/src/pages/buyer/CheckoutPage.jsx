@@ -1,8 +1,10 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
+  const user = useSelector((state) => state.user.user);
   const { storeId } = useParams();
   const navigate = useNavigate();
   
@@ -12,6 +14,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
   const [newCart, setNewCart] = useState([]);
 
   useEffect(() => {
+
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -68,7 +71,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
 
       const options = {
         key: "rzp_test_g0MMzyeHhMKtnq",
-        amount: computedTotalAmount * 100,
+        amount: newCart.total_price * 100, // Amount in paise
         currency: "INR",
         name: "Canteen Automation",
         description: "Order Payment",
@@ -77,8 +80,8 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
           placeOrder("razorpay");
         },
         prefill: {
-          name: "User Name",
-          email: "user@example.com",
+          name: `${user.username}`,
+          email: `${user.email}`,
           contact: "9999999999",
         },
         theme: { color: "#ff6600" },
@@ -95,7 +98,6 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
 
 
   useEffect(() => {
-
     if (accessToken && storeId) {
       fetchCart(); // Call fetchCart inside useEffect correctly
     }  
