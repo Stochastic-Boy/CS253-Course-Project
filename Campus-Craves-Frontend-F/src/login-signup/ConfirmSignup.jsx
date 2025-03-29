@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { signUpSuccess, signUpFailure, signUpStart } from "../reduxfeatures/userSlice";
+import { signUpFailure, signUpStart } from "../reduxfeatures/userSlice";
 import Header from "../components/Header";
 import "./Forms.css";
 
@@ -51,10 +51,8 @@ const ConfirmSignup = () => {
       });
 
       console.log("User registered successfully:", res.data);
-      dispatch(signUpSuccess(res.data));
       
-      const sellerId = res.data?.user.id;
-      navigate(role === "seller" ? `/seller/${sellerId}/ordersview` : "/");
+      navigate("/login");
 
     } catch (err) {
       console.error("Registration failed:", err.response?.data || err.message);
