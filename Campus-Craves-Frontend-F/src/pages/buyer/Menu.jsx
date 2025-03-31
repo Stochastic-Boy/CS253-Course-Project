@@ -9,7 +9,8 @@ const Menu = () => {
   const { storeId } = useParams();
   const navigate = useNavigate();
   const accessToken = localStorage.getItem("access_token");
-
+  
+  const [store, setStore] = useState({});
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState("");
   const [newCategories, setNewCategories] = useState([]);
@@ -88,7 +89,7 @@ const Menu = () => {
         },
       });
 
-      console.log(res.data); // Debugging
+      // console.log(res.data); // Debugging
       setNewCart(res.data); // Update state correctly
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -96,11 +97,22 @@ const Menu = () => {
   }
 
   useEffect(() => {
-
     if (accessToken && storeId) {
       fetchCart(); // Call fetchCart inside useEffect correctly
+      
+      const fetchStore = async () => {
+        const res = await axios.get(`http://localhost:8000/stores/${storeId}/`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(res.data);
+        setStore(res.data);
+      }
+      fetchStore()
     }  
-  }, []); 
+  }, [accessToken, storeId]); 
   
   
 
@@ -109,11 +121,16 @@ const Menu = () => {
       <Header />
       <div className="menu-container">
         <aside className="menu-sidebar">
-          <h2>Categories</h2>
+          <div style={{backgroundColor:"rgb(72, 72, 72)", color:"white", padding:"8px 10px", marginBottom:"20px", borderRadius:"5px"}}>
+            <h4 style={{ margin:"0 0"}}>{store.name}</h4>
+            <h6 style={{color: "rgb(44, 255, 251)", margin:"0 0"}}>Store Id: {storeId}</h6>
+          </div>
+          <h5 style={{padding:"0 15px", fontWeight:"bold"}}>Menu</h5>
 
           <ul>
             {newCategories.map((category) => (
               <li
+              style={{fontSize: "18px"}}
                 key={category.id}
                 onClick={() => {
                   setNewSelectedCategory(category.name);
@@ -139,8 +156,9 @@ const Menu = () => {
             {products
               .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
               .map((item, index) => (
-                <div key={index} className="menu-item">
-                  <span>{item.name} ₹{item.price}</span>
+                <div key={index} className="menu-item" style={{display:"grid", gridTemplateColumns:"5fr 2fr 1fr"}}>
+                  <div>{item.name}</div>
+                  <div>₹{item.price}</div>
                   <button onClick={() => addToCart(item.id, 1)}>Add</button>
                 </div>
               ))}
@@ -148,7 +166,7 @@ const Menu = () => {
         </main>
 
         <aside className="cart">
-          <h2 className="my-2">Items in Cart</h2>
+          <h4 className="mt-2 mb-4">Items in Cart</h4>
           
           {newCart?.items?.length > 0 ? ( // Ensure newCart.items is defined
             <div className="">

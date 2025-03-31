@@ -40,7 +40,7 @@ const FoodGrid = () => {
 
   return (
     <div className="food-grid-container">
-      <div className="food-grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+      <div className="food-grid">
         {stores.slice(0, visibleItems).map((store) => (
           <div 
             key={store.id} 
@@ -50,7 +50,7 @@ const FoodGrid = () => {
           >
             <img src={store.image || "/assets/canteenimg.png"} alt={store.name} className="food-image" />
             <div className="food-name">
-              <h5 style={{ color: "orange", marginBottom: 0 }}>Canteen</h5>
+              <h6 style={{ color: "rgb(44, 255, 251)", marginBottom: 0 }}>Store Id: {store.id}</h6>
               <h4>{store.name}</h4>
             </div>
           </div>

@@ -6,7 +6,7 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, BuyerProfile, SellerProfile
 from .serializers import UserSerializer, BuyerProfileSerializer, SellerProfileSerializer
@@ -106,6 +106,28 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):  
         serializer.save(user=self.request.user)
+
+
+
+class GetUserDetails(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+
+        if user.role == "buyer":
+            profile = get_object_or_404(BuyerProfile, user=user)
+            serializer = BuyerProfileSerializer(profile)
+        else:
+            profile = get_object_or_404(SellerProfile, user=user)
+            serializer = SellerProfileSerializer(profile)
+
+        return Response({
+            "user": UserSerializer(user).data,
+            "profile": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
 
         
 # Send OTP for Password Reset

@@ -94,15 +94,16 @@ const CategoriesView = () => {
 
       <div className="mb-4">
         <input
+          style={{ width: "40%", border: "none", borderRadius: "5px"}}
           type="text"
-          className="border border-gray-400 px-2 py-1 mr-2"
+          className="border border-gray-400 px-2 py-2 mr-2"
           placeholder="New Category Name"
           value={newCategory.name}
           onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
         />
         <button 
-          style={{ backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius: '5px' }} 
-          className="bg-blue-500 text-white px-3 py-1" 
+          style={{ backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius: '5px', margin: "0 10px" }} 
+          className="bg-blue-500 text-white px-3 py-2" 
           onClick={handleAddCategory}
         >
           Add Category

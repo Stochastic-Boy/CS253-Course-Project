@@ -135,19 +135,14 @@ const SellerProfileWithStores = () => {
 
   return (
     <div style={{ height: "100vh", backgroundColor: "#2b2b2b", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
-      <div style={{ position: "absolute", top: "20px", left: "20px", fontSize: "24px", fontWeight: "bold", color: "#ff9800" }}>Campus Craves</div>
       <div style={{ width: "350px", backgroundColor: "#333", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", textAlign: "center", padding: "20px" }}>
         <div style={{ backgroundColor: "#ff9800", height: "50px", borderTopLeftRadius: "10px", borderTopRightRadius: "10px" }}></div>
-        <img src="/assets/profile.png" alt="Profile Icon" style={{ width: "80px", height: "80px", borderRadius: "50%", border: "3px solid #fff", marginTop: "-40px" }} />
-         <h2>{isEditing ? (
-          <input 
-                type="text" 
-                name="business_name"  
-                value={sellerData.business_name}
-                readOnly
-                style={{ width: "100%", padding: "5px", fontSize: "16px", textAlign: "center", backgroundColor: "#616161", color: "white", border: "none", borderRadius: "5px" }} />
-        ) : sellerData.business_name}</h2>
-        <p><strong>Contact:</strong> {isEditing ? (
+        <img src="/assets/admin.png" alt="Profile Icon" style={{backgroundColor:"black", width: "80px", height: "80px", borderRadius: "50%", border: "3px solid #fff", marginTop: "-40px" }} />
+
+        <div className="store-name my-1"><strong>{sellerData.business_name}</strong></div>
+        <div className="store-name my-1"><strong>{user.email}</strong></div>
+        
+        <p className="mt-4"><strong>Contact:</strong> {isEditing ? (
           <input 
           type="text" 
           name="contact_number" 
@@ -155,14 +150,6 @@ const SellerProfileWithStores = () => {
           onChange={handleChange} 
           style={{ width: "100%", padding: "5px", fontSize: "16px", textAlign: "center", backgroundColor: "#616161", color: "white", border: "none", borderRadius: "5px" }} />
         ) : sellerData.contact_number}</p>
-        <p><strong>Location:</strong> {isEditing ? (
-          <input 
-                type="text" 
-                name="location" 
-                value={sellerData.location} 
-                readOnly
-                style={{ width: "100%", padding: "5px", fontSize: "16px", textAlign: "center", backgroundColor: "#616161", color: "white", border: "none", borderRadius: "5px" }} />
-        ) : sellerData.location}</p> 
         
         <button onClick={toggleEdit} style={{ marginTop: "10px", padding: "8px 16px", fontSize: "16px", cursor: "pointer", border: "none", borderRadius: "5px", backgroundColor: isEditing ? "#4caf50" : "#ff9800", color: "white" }}>
           {isEditing ? "Save" : "Edit"}
@@ -180,42 +167,52 @@ const SellerProfileWithStores = () => {
             <button onClick={handleCreateStore}>Create Store</button>
           </div>
         ) : (
-          <ul>
+          <div>
             {stores.map((store) => (
-      <li key={store.id}>
-        {editingStore === store.id ? (
-          <div>
-            <input
-              type="text"
-              value={editedStore.name}
-              onChange={(e) => setEditedStore({ ...editedStore, name: e.target.value })}
-            />
-            <input
-              type="text"
-              value={editedStore.description}
-              onChange={(e) => setEditedStore({ ...editedStore, description: e.target.value })}
-            />
-            <input
-              type="text"
-              value={editedStore.location}
-              onChange={(e) => setEditedStore({ ...editedStore, location: e.target.value })}
-            />
-            <button onClick={handleUpdateStore}>Save</button>
-            <button onClick={() => setEditingStore(null)}>Cancel</button>
+            <div key={store.id}>
+              {editingStore === store.id ? (
+                <div style={{display:"flex", flexDirection:"column", gap:"10px", width:"400px"}}>
+                  <input
+                    type="text"
+                    value={editedStore.name}
+                    onChange={(e) => setEditedStore({ ...editedStore, name: e.target.value })}
+                  />
+                  <input
+                    type="text"
+                    value={editedStore.description}
+                    onChange={(e) => setEditedStore({ ...editedStore, description: e.target.value })}
+                  />
+                  <input
+                    type="text"
+                    value={editedStore.location}
+                    onChange={(e) => setEditedStore({ ...editedStore, location: e.target.value })}
+                  />
+                  <div className="store-edit-buttons" style={{display:"flex", gap:"10px"}}>
+                    <button style={{ marginTop: "10px", padding: "4px 8px", fontSize: "16px", cursor: "pointer", border: "none", backgroundColor:"rgb(0, 164, 44)", borderRadius: "5px", color: "white", margin:"10px 8px" }} onClick={handleUpdateStore}>Save</button>
+                    <button style={{ marginTop: "10px", padding: "4px 8px", fontSize: "16px", cursor: "pointer", border: "none", backgroundColor:"rgb(255, 0, 0)", borderRadius: "5px", color: "white", margin:"10px 8px" }} onClick={() => setEditingStore(null)}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                <div><strong>{store.name}</strong></div>
+                <div>{store.description}</div>
+                <div><strong>Location: </strong>{store.location}</div>
+                <div><strong>Status: </strong>{store.status}</div>
+
+                <button style={{ marginTop: "10px", padding: "4px 8px", fontSize: "16px", cursor: "pointer", border: "none", backgroundColor:"#ff9800", borderRadius: "5px", color: "white", margin:"10px 8px" }}
+                onClick={() => {
+                  setEditingStore(store.id);
+                  setEditedStore(store); 
+                }}>Edit Store</button>
+                <button style={{ marginTop: "10px", padding: "4px 8px", fontSize: "16px", cursor: "pointer", border: "none", backgroundColor:"rgb(255, 0, 0)", borderRadius: "5px", color: "white", margin:"0 8px" }}
+                onClick={handleDeleteStore}>
+                Delete
+                </button>
+              </div>
+              )}
+            </div>
+          ))}
           </div>
-        ) : (
-          <div>
-          <span>{store.name} - {store.description} - {store.location} - {store.status}</span>
-          <button onClick={() => {
-            setEditingStore(store.id);
-            setEditedStore(store); 
-          }}>Edit</button>
-          <button onClick={handleDeleteStore}>Delete</button>
-        </div>
-        )}
-      </li>
-    ))}
-    </ul>
         )}
       </div>
     </div>

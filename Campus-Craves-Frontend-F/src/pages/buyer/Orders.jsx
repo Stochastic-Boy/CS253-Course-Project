@@ -19,6 +19,7 @@ const Orders = () => {
         },
       });
       setOrders(res.data);
+      console.log(res.data);
     } catch (err) {
       console.error("Error fetching orders", err);
     }
@@ -68,15 +69,17 @@ const Orders = () => {
           }}
         >
        {orders.map((order) => (
-        <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)'}}>
-          <p className="font-semibold">Order #{order.id}</p>
-          <p>Status: {order.status}</p>
-          <p>Payment: {order.payment_method}</p>
-          <p>Total: ₹{order.total_price}</p>
-          <p>Address: {order.delivery_address}</p>
-          <p>Date: {new Date(order.created_at).toLocaleString()}</p>
-
-          <ul className="ml-4 mt-2">
+        <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)', position:'relative'}}>
+          <div className="font-semibold">Order Number: {order.id}</div>
+          <div>Store Id: {order.store}</div>
+          <div>Status: {order.status}</div>
+          <div>Payment: {order.payment_method}</div>
+          <div>Total: ₹{order.total_price}</div>
+          <div>Delivery Address: {order.delivery_address}</div>
+          <div>Date: {new Date(order.created_at).toLocaleString()}</div>
+          
+          <h5 className="text-semibold mt-4">Ordered Items: </h5>
+          <ul className="ml-4 mt-2 mb-4" style={{paddingBottom:"25px"}}>
             {order.items.map((item) => (
               <li key={item.id}>
                 {item.product_details.name} × {item.quantity} = ₹{item.price * item.quantity}
@@ -85,14 +88,14 @@ const Orders = () => {
           </ul>
 
           {order.status !== "delivered" && order.status !== "cancelled" && (
-            <div className="mt-2 space-x-2">
-              <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
+            <div className="mt-2 space-x-2" style={{position:'absolute', bottom:'10px', left:'10px'}}>
+              <button style={{backgroundColor: 'rgb(251, 29, 29)', border: 'none', borderRadius:'5px'}}
                 onClick={() => cancelOrder(order.id)}
                 className="px-3 mx-3 py-1 bg-red-500 text-white rounded"
               >
                 Cancel Order
               </button>
-              <button style={{backgroundColor: 'rgb(255, 158, 2)', border: 'none', borderRadius:'5px'}}
+              <button style={{backgroundColor: 'rgb(0, 145, 31)', border: 'none', borderRadius:'5px'}}
                 onClick={() => confirmDelivery(order.id)}
                 className="px-3 mx-3 py-1 bg-green-600 text-white rounded"
               >
