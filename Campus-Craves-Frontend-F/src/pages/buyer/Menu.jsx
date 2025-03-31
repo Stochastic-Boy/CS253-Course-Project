@@ -123,7 +123,7 @@ const Menu = () => {
         <aside className="menu-sidebar">
           <div style={{backgroundColor:"rgb(72, 72, 72)", color:"white", padding:"8px 10px", marginBottom:"20px", borderRadius:"5px"}}>
             <h4 style={{ margin:"0 0"}}>{store.name}</h4>
-            <h6 style={{color: "rgb(44, 255, 251)", margin:"0 0"}}>Store Id: {storeId}</h6>
+            {/* <h6 style={{color: "rgb(44, 255, 251)", margin:"0 0"}}>Store Id: {storeId}</h6> */}
           </div>
           <h5 style={{padding:"0 15px", fontWeight:"bold"}}>Menu</h5>
 

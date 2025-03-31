@@ -50,7 +50,7 @@ const FoodGrid = () => {
           >
             <img src={store.image || "/assets/canteenimg.png"} alt={store.name} className="food-image" />
             <div className="food-name">
-              <h6 style={{ color: "rgb(44, 255, 251)", marginBottom: 0 }}>Store Id: {store.id}</h6>
+              {/* <h6 style={{ color: "rgb(44, 255, 251)", marginBottom: 0 }}>Store Id: {store.id}</h6> */}
               <h4>{store.name}</h4>
             </div>
           </div>

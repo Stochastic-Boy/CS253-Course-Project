@@ -5,7 +5,7 @@ import axios from "axios";
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState("");
-  const token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("access_token");
 
   useEffect(() => {
     fetchOrders();
@@ -15,11 +15,45 @@ const Orders = () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/orders/myorders/", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       setOrders(res.data);
-      console.log(res.data);
+      // console.log(res.data);
+
+      const storeIds = [...new Set(res.data.map((order => order.store)))];
+
+      const storesArray = await Promise.all(
+        storeIds.map(async (id) => {
+          try {
+            const response = await axios.get(`http://127.0.0.1:8000/stores/${id}/`, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            });
+            return response.data;  // Return actual data
+          } catch (error) {
+            console.error(`Failed to fetch store ${id}:`, error);
+            return null;  // Handle errors gracefully
+          }
+        })
+      );
+      
+      const storesMap = {};
+      storesArray.forEach((storeDetails) => {
+        if (storeDetails) {  // Ensure storeDetails is not null
+          storesMap[storeDetails.id] = storeDetails;
+        }
+      });
+      
+      const ordersWithStores = res.data.map((order) => ({
+        ...order,
+        storeDetails: storesMap[order.store] || null,  // Fix key lookup
+      }));
+      
+      setOrders(ordersWithStores);
+      // console.log(ordersWithStores)
+
     } catch (err) {
       console.error("Error fetching orders", err);
     }
@@ -29,7 +63,7 @@ const Orders = () => {
     try {
       const res = await axios.post(`http://127.0.0.1:8000/orders/cancel/${orderId}/`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       setMessage(res.data.message);
@@ -43,7 +77,7 @@ const Orders = () => {
     try {
       const res = await axios.post(`http://127.0.0.1:8000/orders/confirm/${orderId}/`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       setMessage(res.data.message);
@@ -70,8 +104,9 @@ const Orders = () => {
         >
        {orders.map((order) => (
         <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)', position:'relative'}}>
+          <div style={{fontSize:"1.2rem", fontWeight:"bold"}}>{order?.storeDetails?.name}</div>
           <div className="font-semibold">Order Number: {order.id}</div>
-          <div>Store Id: {order.store}</div>
+          {/* <div>Store Id: {order.store}</div> */}
           <div>Status: {order.status}</div>
           <div>Payment: {order.payment_method}</div>
           <div>Total: ₹{order.total_price}</div>
