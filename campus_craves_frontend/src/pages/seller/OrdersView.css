@@ -1,0 +1,17 @@
+.seller-orders{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.seller-orders-card{
+  width: 40%;
+  background-color: rgb(55, 55, 55);
+  color: aliceblue;
+}
+
+.orders-h1{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
