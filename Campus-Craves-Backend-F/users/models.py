@@ -62,7 +62,7 @@ class BuyerProfile(models.Model):
     def __str__(self):
         return f"Buyer Profile: {self.user.username}"
 
-# # Seller Profile Model (Must be defined AFTER User)
+# Seller Profile Model (Must be defined AFTER User)
 # class SellerProfile(models.Model):
 #     """Profile model for Sellers"""
 #     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="seller_profile")
