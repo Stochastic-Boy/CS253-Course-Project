@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import update_last_login
 from django.shortcuts import get_object_or_404
@@ -6,19 +5,16 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, BuyerProfile, SellerProfile
 from .serializers import UserSerializer, BuyerProfileSerializer, SellerProfileSerializer
-from django.core.mail import send_mail
 import random
-from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .controller import get_user_by_email, create_user, authenticate_user
 from rest_framework.permissions import AllowAny
 import json
-
 from django.conf import settings
 import random
 import sendgrid
@@ -32,7 +28,6 @@ OTP_STORAGE = {}
 def home(request):
     return JsonResponse({"message": "Welcome to Campus Craves API!"})
 
-# User Signup
 class RegisterUser(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -62,7 +57,7 @@ class RegisterUser(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# User Login
+
 class LoginUser(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -83,7 +78,7 @@ class LoginUser(APIView):
             })
         return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 
-# User Logout
+
 class LogoutUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -108,7 +103,6 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
         serializer.save(user=self.request.user)
 
         
-# Send OTP for Password Reset
 class SendOTP(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -139,7 +133,7 @@ class SendOTP(APIView):
         except Exception as e:
             return Response({"error": f"Failed to send OTP. {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# Send OTP for Email Verification at Signup
+
 class SignupOTP(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -150,7 +144,6 @@ class SignupOTP(APIView):
         
         otp = random.randint(100000, 999999)
         OTP_STORAGE[email] = otp  
-        print(f"OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
         
         if not SENDGRID_API_KEY:
             return Response({"error": "SendGrid API Key is missing."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -169,28 +162,25 @@ class SignupOTP(APIView):
             )
             
             response = sg.send(message)
-            print(f"SendGrid Response: {response.status_code}, {response.body}")
     
             return Response({"message": "OTP sent successfully."}, status=status.HTTP_200_OK)
         except Exception as e:
-            print(f"Failed to send OTP. Error: {e}")
             return Response({"error": f"Failed to send OTP. {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# Verify OTP for Signup
+
 class VerifyOTP(APIView):
     def post(self, request):
         email = request.data.get('email')
         otp = int(request.data.get('otp'))
-
-        print(f"Email: {email}, OTP: {otp}, OTP_STORAGE: {OTP_STORAGE}")
-        
+   
         if OTP_STORAGE.get(email) == otp:
             OTP_STORAGE.pop(email)  
             return Response({"message": "OTP verified successfully."}, status=status.HTTP_200_OK)
         
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
-# Verify OTP & Reset Password
+
+
 class ResetPassword(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -202,17 +192,16 @@ class ResetPassword(APIView):
             if not user:
                 return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
             hashed_password = make_password(new_password)
-            print(f"New Password: {new_password}, Hashed Password: {hashed_password}")
             if new_password is None:
                     return Response({"error": "New password cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
 
             user.password = hashed_password
             user.save(using="default")
-            print(f"User Password Updated: {user.password}")
             OTP_STORAGE.pop(email)  
             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
 
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @csrf_exempt
 def user_login(request):
@@ -222,6 +211,7 @@ def user_login(request):
         if user:
             return JsonResponse({"message": "Login successful", "user_id": user.id})
         return JsonResponse({"error": "Invalid credentials"}, status=400)
+
 
 @csrf_exempt
 def user_signup(request):
