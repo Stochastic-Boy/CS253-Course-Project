@@ -32,7 +32,7 @@ class StoreListView(generics.ListAPIView):
 class StoreDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, store_id):
+    def get(self, request, store_id):   
         store = get_store_by_id(store_id)
         if store:
             return Response(StoreSerializer(store).data)

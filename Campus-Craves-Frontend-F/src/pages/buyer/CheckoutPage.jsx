@@ -137,9 +137,9 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
   
 
   return (
-    <div className="checkout-container" style={{width: "100vw"}}>
+    <div className="checkout-container" style={{width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>
 
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", width: "40%" }}>
+    <div style={{ padding: "30px", fontFamily: "Arial, sans-serif", width: "40%", backgroundColor: "rgb(150, 251, 255)", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)" }}>
       <h2 style={{ borderBottom: "2px solid #ff6600", paddingBottom: "10px" }}>Checkout</h2>
 
       <div>

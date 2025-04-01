@@ -6,7 +6,8 @@ const OrdersView = () => {
   const [orders, setOrders] = useState([]);
   const [message, setMessage] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(10);
-  const token = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("access_token");
+  const [buyers, setBuyers] = useState([]);
 
   useEffect(() => {
     fetchSellerOrders();
@@ -16,14 +17,47 @@ const OrdersView = () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/orders/sellerorders/", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
+  
       setOrders(res.data);
+      // console.log("Orders:", res.data);
+
+      const buyerIds = [...new Set(res.data.map(order => order.user))];
+  
+      // ✅ Fetch buyer details correctly
+      const buyersData = await Promise.all(
+        buyerIds.map((id) => 
+          axios.get(`http://127.0.0.1:8000/users/${id}/`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }).then(response => response.data)  // Extract response data
+        )
+      );
+  
+      // ✅ Create a map of buyers
+      const buyerMap = {};
+      buyersData.forEach((buyer) => {
+        buyerMap[buyer.user.id] = buyer;
+      });
+  
+      // ✅ Add buyer details to orders
+      const ordersWithBuyers = res.data.map((order) => ({
+        ...order,
+        buyer: buyerMap[order.user] || null, 
+      }));
+  
+      setOrders(ordersWithBuyers);
+      // console.log("Orders with Buyers:", ordersWithBuyers);
+  
     } catch (err) {
       console.error("Error fetching seller orders", err);
     }
   };
+  
+  
 
   const handleViewMore = () => {
     setVisibleOrders((prev) => prev + 10);
@@ -52,18 +86,20 @@ const OrdersView = () => {
        {orders.slice(0, visibleOrders).map((order) => (
         <div key={order.id} className="seller-orders-card border rounded p-3 mb-4">
           <div className="orders-h1">
-            <p className="font-semibold">Order Number: {order.id}</p>
+            <div className="font-semibold">Order Number: {order.id}</div>
             <h5 style={{color: order.status==='delivered' ? "rgb(59, 255, 108)" : order.status==='pending' ? "rgb(255, 255, 0)" : "rgb(255, 53, 53)"}}>{order.status}</h5>
           </div>  
-          <p>Buyer: {order.user}</p>
-          <p>Payment: {order.payment_method}</p>
-          <p>Total: ₹{order.total_price}</p>
-          <p>Address: {order.delivery_address}</p>
-          <p>Date: {new Date(order.created_at).toLocaleString()}</p>
+          <div>Buyer: {order?.buyer?.user?.username}</div>
+          <div>Contact: {order?.buyer?.profile?.phone_number}</div>
+          <div>Payment: {order.payment_method}</div>
+          <div>Total: ₹{order.total_price}</div>
+          <div>Address: {order.delivery_address}</div>
+          <div>Date: {new Date(order.created_at).toLocaleString()}</div>
 
+          <h5 className="font-semibold mt-4">Items:</h5>
           <ul className="ml-4 mt-2">
             {order.items.map((item) => (
-              <li key={item.id}>
+              <li style={{color: "rgb(111, 255, 250)"}} key={item.id}>
                 {item.product_details.name} × {item.quantity} = ₹{item.price * item.quantity}
               </li>
             ))}

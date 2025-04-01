@@ -1,7 +1,10 @@
 import React, { useState, useEffect  } from "react";
+import Header from "../../components/Header";
+import { useSelector } from "react-redux";
 
 const BuyerProfile = () => {
-    const [user, setUser] = useState({ phone_number: "", address: "" });
+    const user = useSelector((state) => state.user.user);
+    const [userDetails, setUserDetails] = useState({ phone_number: "", address: "" });
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,7 +17,7 @@ const BuyerProfile = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                setUser({ id: data.id, phone_number: data.phone_number, address: data.address });
+                setUserDetails({ id: data.id, phone_number: data.phone_number, address: data.address });
                 setLoading(false);
             })
             .catch((error) => {
@@ -26,7 +29,7 @@ const BuyerProfile = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUser({ ...user, [name]: value || "" });
+        setUserDetails({ ...userDetails, [name]: value || "" });
     };
     
 
@@ -40,8 +43,8 @@ const BuyerProfile = () => {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 },
                 body: JSON.stringify({
-                    phone_number: user.phone_number || "", // Ensures no null values
-                    address: user.address || "",          // Ensures no null values
+                    phone_number: userDetails.phone_number || "", // Ensures no null values
+                    address: userDetails.address || "",          // Ensures no null values
                 }),
             })
                 .then((response) => response.json())
@@ -61,10 +64,12 @@ const BuyerProfile = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        height: "100vh",
+        height:"calc(100vh - 60px)",
+        justifyContent: "center",
         backgroundColor: "#2c2c2c",
-        padding: "20px",
-        color: "white"
+        padding: "auto",
+        color: "white",
+        // padding: "100px"
     };
 
     const headerStyle = {
@@ -140,10 +145,9 @@ const BuyerProfile = () => {
     };
 
     return (
+        <div>
+            <Header/>
         <div style={containerStyle}>
-            <div style={headerStyle}>
-    <a href="/" style={{ textDecoration: "none", color: "inherit" }}>Campus Craves</a>
-</div>
             <div style={profileCardStyle}>
                 <div style={bannerStyle}></div>
                 <div style={imageContainerStyle}>
@@ -151,38 +155,41 @@ const BuyerProfile = () => {
                 </div>
                 <div style={detailsStyle}>
                 <p>
-                        <strong>Phone Number: </strong>
-                        {isEditing ? (
-                            <input 
-                                type="text" 
-                                name="phone_number" 
-                                value={user.phone_number} 
-                                onChange={handleChange} 
-                                className="input-field" 
-                            />
-                        ) : (
-                            user.phone_number
-                        )}
-                    </p>
-                    <p>
-                        <strong>Current Address: </strong>
-                        {isEditing ? (
-                            <input 
-                                type="text" 
-                                name="address" 
-                                value={user.address} 
-                                onChange={handleChange} 
-                                className="input-field" 
-                            />
-                        ) : (
-                            user.address
-                        )}
-                    </p>
-                    <button style={buttonStyle} onClick={toggleEdit}>
-                        {isEditing ? "Save" : "Edit"}
-                    </button>
+                    <div className="username my-2"><strong>Username: </strong>{user.username}</div>
+                    <div className="email my-2"><strong>Email: </strong>{user.email}</div>
+                    <strong>Phone Number: </strong>
+                    {isEditing ? (
+                        <input 
+                            type="text" 
+                            name="phone_number" 
+                            value={userDetails.phone_number} 
+                            onChange={handleChange} 
+                            className="input-field" 
+                        />
+                    ) : (
+                        userDetails.phone_number
+                    )}
+                </p>
+                <p>
+                    <strong>Current Address: </strong>
+                    {isEditing ? (
+                        <input 
+                            type="text" 
+                            name="address" 
+                            value={userDetails.address} 
+                            onChange={handleChange} 
+                            className="input-field" 
+                        />
+                    ) : (
+                        userDetails.address
+                    )}
+                </p>
+                <button style={buttonStyle} onClick={toggleEdit}>
+                    {isEditing ? "Save" : "Edit"}
+                </button>
                 </div>
             </div>
+        </div>
         </div>
     );
 };

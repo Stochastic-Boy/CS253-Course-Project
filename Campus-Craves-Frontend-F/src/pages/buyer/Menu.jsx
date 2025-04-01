@@ -9,7 +9,8 @@ const Menu = () => {
   const { storeId } = useParams();
   const navigate = useNavigate();
   const accessToken = localStorage.getItem("access_token");
-
+  
+  const [store, setStore] = useState({});
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState("");
   const [newCategories, setNewCategories] = useState([]);
@@ -17,10 +18,19 @@ const Menu = () => {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [newCart, setNewCart] = useState([]);
+  const [sellerData, setSellerData] = useState({});
 
-  useEffect(() => {
-    if (storeId) fetchCategories();
-  }, [storeId]);
+
+  const fetchProducts = async (categoryId) => {
+    try {
+      const res = await axios.get(
+        `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
+      );
+      setProducts(res.data);
+    } catch (err) {
+      console.error("Error fetching products:", err.response?.data || err.message);
+    }
+  };
 
   useEffect(() => {
     if (newSelectedCategory) {
@@ -41,14 +51,15 @@ const Menu = () => {
     }
   };
 
-  const fetchProducts = async (categoryId) => {
+  const fetchSellerData = async (sellerId) => {
     try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
-      );
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Error fetching products:", err.response?.data || err.message);
+      const response = await axios.get(`http://127.0.0.1:8000/users/${sellerId}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+      });
+      setSellerData(response.data);
+      // console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching seller details:", error);
     }
   };
 
@@ -57,7 +68,6 @@ const Menu = () => {
       alert("Please log in first!");
       return;
     }
-  
     try {
       await axios.post(
         "http://127.0.0.1:8000/cart/add/",
@@ -76,8 +86,6 @@ const Menu = () => {
     fetchCart(); // Refresh cart after update
   };
   
-  
-  
 
   const fetchCart=async()=> {  // Move function outside if block
     try {
@@ -88,19 +96,34 @@ const Menu = () => {
         },
       });
 
-      console.log(res.data); // Debugging
+      // console.log(res.data); // Debugging
       setNewCart(res.data); // Update state correctly
     } catch (error) {
       console.error("Error fetching cart:", error);
     }
   }
+  const fetchStore = async () => {
+    const res = await axios.get(`http://localhost:8000/stores/${storeId}/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    // console.log(res.data);
+    setStore(res.data);
+
+    if(res.data.seller_id) {
+      fetchSellerData(res.data.seller_id);
+    }
+  }
 
   useEffect(() => {
-
     if (accessToken && storeId) {
-      fetchCart(); // Call fetchCart inside useEffect correctly
+      fetchStore();
+      fetchCategories();
+      fetchCart();
     }  
-  }, []); 
+  }, [accessToken, storeId]); 
   
   
 
@@ -109,11 +132,17 @@ const Menu = () => {
       <Header />
       <div className="menu-container">
         <aside className="menu-sidebar">
-          <h2>Categories</h2>
+          <div style={{backgroundColor:"rgb(72, 72, 72)", color:"white", padding:"8px 10px", marginBottom:"20px", borderRadius:"5px"}}>
+            <h4 style={{ margin:"8px 0"}}>{store.name}</h4>
+            <h6>Phone: <span style={{color: "rgb(44, 255, 251)", margin:"0 0", padding:"0 0"}}>{sellerData?.profile?.contact_number}</span></h6>
+            <h6>Location: <span style={{color: "rgb(44, 255, 251)", margin:"0 0", padding:"0 0"}}>{sellerData?.profile?.location}</span></h6>
+          </div>
+          <h5 style={{padding:"0 15px", fontWeight:"bold"}}>Menu</h5>
 
           <ul>
             {newCategories.map((category) => (
               <li
+              style={{fontSize: "18px"}}
                 key={category.id}
                 onClick={() => {
                   setNewSelectedCategory(category.name);
@@ -139,8 +168,9 @@ const Menu = () => {
             {products
               .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
               .map((item, index) => (
-                <div key={index} className="menu-item">
-                  <span>{item.name} ₹{item.price}</span>
+                <div key={index} className="menu-item" style={{display:"grid", gridTemplateColumns:"5fr 2fr 1fr"}}>
+                  <div>{item.name}</div>
+                  <div>₹{item.price}</div>
                   <button onClick={() => addToCart(item.id, 1)}>Add</button>
                 </div>
               ))}
@@ -148,7 +178,7 @@ const Menu = () => {
         </main>
 
         <aside className="cart">
-          <h2 className="my-2">Items in Cart</h2>
+          <h4 className="mt-2 mb-4">Items in Cart</h4>
           
           {newCart?.items?.length > 0 ? ( // Ensure newCart.items is defined
             <div className="">
