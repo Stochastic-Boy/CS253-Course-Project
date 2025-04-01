@@ -15,7 +15,7 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=50)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_address = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Confirmed')
     created_at = models.DateTimeField(auto_now_add=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     delivered_at = models.DateTimeField(null=True, blank=True)
