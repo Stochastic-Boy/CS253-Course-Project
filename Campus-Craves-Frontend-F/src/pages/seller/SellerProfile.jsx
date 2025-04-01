@@ -159,12 +159,12 @@ const SellerProfileWithStores = () => {
       <div className="store-management p-4" style={{ marginTop: "20px" }}>
         <h2>Manage Stores</h2>
         {stores.length === 0 ? (
-          <div>
+          <div style={{display:"flex", flexDirection:"column", gap: "10px"}}>
             <h3>No stores found. Create a new store:</h3>
-            <input type="text" placeholder="Name" value={newStore.name} onChange={(e) => setNewStore({ ...newStore, name: e.target.value })} />
+            <input type="text" placeholder="Store Name" value={newStore.name} onChange={(e) => setNewStore({ ...newStore, name: e.target.value })} />
             <input type="text" placeholder="Description" value={newStore.description} onChange={(e) => setNewStore({ ...newStore, description: e.target.value })} />
             <input type="text" placeholder="Location" value={newStore.location} onChange={(e) => setNewStore({ ...newStore, location: e.target.value })} />
-            <button onClick={handleCreateStore}>Create Store</button>
+            <button style={{ marginTop: "10px", padding: "4px 8px", fontSize: "16px", cursor: "pointer", border: "none", borderRadius: "5px", backgroundColor:"#ff9800", width:"200px"}} onClick={handleCreateStore}>Create Store</button>
           </div>
         ) : (
           <div>

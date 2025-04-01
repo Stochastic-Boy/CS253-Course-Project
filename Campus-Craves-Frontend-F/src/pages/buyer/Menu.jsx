@@ -18,10 +18,19 @@ const Menu = () => {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
   const [newCart, setNewCart] = useState([]);
+  const [sellerData, setSellerData] = useState({});
 
-  useEffect(() => {
-    if (storeId) fetchCategories();
-  }, [storeId]);
+
+  const fetchProducts = async (categoryId) => {
+    try {
+      const res = await axios.get(
+        `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
+      );
+      setProducts(res.data);
+    } catch (err) {
+      console.error("Error fetching products:", err.response?.data || err.message);
+    }
+  };
 
   useEffect(() => {
     if (newSelectedCategory) {
@@ -42,14 +51,15 @@ const Menu = () => {
     }
   };
 
-  const fetchProducts = async (categoryId) => {
+  const fetchSellerData = async (sellerId) => {
     try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/products/public/products/${storeId}/${categoryId}/`
-      );
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Error fetching products:", err.response?.data || err.message);
+      const response = await axios.get(`http://127.0.0.1:8000/users/${sellerId}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+      });
+      setSellerData(response.data);
+      // console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching seller details:", error);
     }
   };
 
@@ -58,7 +68,6 @@ const Menu = () => {
       alert("Please log in first!");
       return;
     }
-  
     try {
       await axios.post(
         "http://127.0.0.1:8000/cart/add/",
@@ -77,8 +86,6 @@ const Menu = () => {
     fetchCart(); // Refresh cart after update
   };
   
-  
-  
 
   const fetchCart=async()=> {  // Move function outside if block
     try {
@@ -95,22 +102,26 @@ const Menu = () => {
       console.error("Error fetching cart:", error);
     }
   }
+  const fetchStore = async () => {
+    const res = await axios.get(`http://localhost:8000/stores/${storeId}/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    // console.log(res.data);
+    setStore(res.data);
+
+    if(res.data.seller_id) {
+      fetchSellerData(res.data.seller_id);
+    }
+  }
 
   useEffect(() => {
     if (accessToken && storeId) {
-      fetchCart(); // Call fetchCart inside useEffect correctly
-      
-      const fetchStore = async () => {
-        const res = await axios.get(`http://localhost:8000/stores/${storeId}/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        });
-        console.log(res.data);
-        setStore(res.data);
-      }
-      fetchStore()
+      fetchStore();
+      fetchCategories();
+      fetchCart();
     }  
   }, [accessToken, storeId]); 
   
@@ -122,8 +133,9 @@ const Menu = () => {
       <div className="menu-container">
         <aside className="menu-sidebar">
           <div style={{backgroundColor:"rgb(72, 72, 72)", color:"white", padding:"8px 10px", marginBottom:"20px", borderRadius:"5px"}}>
-            <h4 style={{ margin:"0 0"}}>{store.name}</h4>
-            {/* <h6 style={{color: "rgb(44, 255, 251)", margin:"0 0"}}>Store Id: {storeId}</h6> */}
+            <h4 style={{ margin:"8px 0"}}>{store.name}</h4>
+            <h6>Phone: <span style={{color: "rgb(44, 255, 251)", margin:"0 0", padding:"0 0"}}>{sellerData?.profile?.contact_number}</span></h6>
+            <h6>Location: <span style={{color: "rgb(44, 255, 251)", margin:"0 0", padding:"0 0"}}>{sellerData?.profile?.location}</span></h6>
           </div>
           <h5 style={{padding:"0 15px", fontWeight:"bold"}}>Menu</h5>
 
