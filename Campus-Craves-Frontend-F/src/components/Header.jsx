@@ -4,15 +4,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useDispatch, useSelector } from "react-redux"; 
 import './Header.css'
 import { logout } from "../reduxfeatures/userSlice";
-
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-
+  
   const userData = useSelector((state)=>state.user.user);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const token = localStorage.getItem("access_token");
 
   return (
-
+  
     <Navbar variant="dark" expand="lg" className="navbar py-2">
     <Container className="navContainer">
       <Navbar.Brand className="navlogo" as={Link} to="/" style={{textDecoration:"bold"}}>
@@ -24,17 +26,26 @@ const Header = () => {
           <Nav className="ms-auto">
 
             <Nav.Link className="navbutton home-btn" as={Link} to="/">Home</Nav.Link> 
-
             <Nav.Link className="navbutton" as={Link} to="/canteens">Canteens</Nav.Link>
-             <Nav.Link className="navbutton" as={Link} to="/order">Orders</Nav.Link>
+
+            {token && ( 
+                <Nav.Link className="navbutton" as={Link} to="/order">Orders</Nav.Link>
+            )}
+
              <div className="auth">
                {userData ? 
                <>
                 <Nav.Link as={Link} to="/profile" className="navbutton userAvatar px-4">
                   {userData?.username}
                 </Nav.Link>
-                <button onClick={()=>dispatch(logout())} className="user-logout-btn">Logout</button>
-               </>
+                <button
+                  onClick={() => {
+                    dispatch(logout());
+                    navigate("/");
+                  }}
+                  className="user-logout-btn"
+                >Logout</button>
+                </>
                :<Nav.Link className="loginBtn" as={Link} to="/login">Login</Nav.Link>
                }
              </div>
