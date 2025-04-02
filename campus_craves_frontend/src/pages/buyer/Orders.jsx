@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import axios from "axios";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const [message, setMessage] = useState("");
   const accessToken = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -64,10 +66,17 @@ const Orders = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      setMessage(res.data.message);
+      toast.success(res.data.message, {
+        position: "top-center",
+        autoClose: 3000,
+      });
       fetchOrders();
     } catch (err) {
       console.error("Error cancelling order", err);
+      toast.error("Failed to cancel order. Please try again.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -78,10 +87,17 @@ const Orders = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      setMessage(res.data.message);
+      toast.success(res.data.message, {
+        position: "top-center",
+        autoClose: 3000,
+      });
       fetchOrders();
     } catch (err) {
       console.error("Error confirming delivery", err);
+      toast.error("Failed to confirm delivery. Please try again.", {
+        position: "top-center",
+        autoClose: 1000,
+      });
     }
   };
 
@@ -90,9 +106,7 @@ const Orders = () => {
       <Header/>
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">My Orders</h2>
-      {message && <p className="text-green-600">{message}</p>}
 
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> */}
       <div
           style={{
             display: "grid",
@@ -104,7 +118,6 @@ const Orders = () => {
         <div key={order.id} className="border rounded p-3 mb-4" style={{backgroundColor: 'rgb(187, 187, 187)', position:'relative'}}>
           <div style={{fontSize:"1.2rem", fontWeight:"bold"}}>{order?.storeDetails?.name}</div>
           <div className="font-semibold">Order Number: {order.id}</div>
-          {/* <div>Store Id: {order.store}</div> */}
           <div>Status: {order.status}</div>
           <div>Payment: {order.payment_method}</div>
           <div>Total: ₹{order.total_price}</div>
@@ -139,6 +152,7 @@ const Orders = () => {
         </div>
       ))}
       </div>
+      <ToastContainer/>
     </div>
     </div>
 

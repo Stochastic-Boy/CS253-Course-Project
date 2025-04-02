@@ -3,7 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const Checkout = () => {
   const user = useSelector((state) => state.user.user);
   const { storeId } = useParams();
   const navigate = useNavigate();
@@ -35,17 +38,6 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
     document.body.appendChild(script);
   }, []);
 
-  const items = [
-    { name: "Paneer Tikka", price: 120, quantity: 1 },
-    { name: "Margherita Pizza", price: 200, quantity: 5 },
-    { name: "Hakka Noodles", price: 110, quantity: 1 },
-  ];
-
-  const computedTotalAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
   const placeOrder = async (method) => {
     try {
       const res = await fetch("http://127.0.0.1:8000/orders/checkout/", {
@@ -64,52 +56,56 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
       const data = await res.json();
       
       if (res.ok) {
-        setMessage("Order placed successfully!");
-        setTimeout(() => navigate("/order"), 1000); // Redirect after 2s
+        toast.success("Order placed successfully!", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+  
+        setTimeout(() => navigate("/order"), 3000);
       } else {
-        setMessage(data.error || "Order placement failed.");
+        toast.error(data.error || "Order placement failed.", {
+          position: "top-center",
+          autoClose: 3000,
+        });
       }
     } catch (error) {
       console.error("Order placement error:", error);
-      setMessage("Something went wrong while placing the order.");
     }
   };
 
   const handlePayment = () => {
-    console.log(userDetails)
+    console.log(userDetails);
     if (paymentMethod === "razorpay") {
       if (!window.Razorpay) {
-        alert("Razorpay SDK failed to load.");
+        setMessage("Razorpay SDK failed to load.");
         return;
       }
 
       const options = {
         key: "rzp_test_g0MMzyeHhMKtnq",
-        amount: newCart.total_price * 100, // Amount in paise
+        amount: newCart.total_price * 100, 
         currency: "INR",
         name: "Canteen Automation",
         description: "Order Payment",
         handler: function (response) {
-          alert("Payment Successful: " + response.razorpay_payment_id);
+          setMessage("Payment Successful: " + response.razorpay_payment_id);
           placeOrder("razorpay");
         },
         prefill: {
           name: `${user.username}`,
           email: `${user.email}`,
-          contact: ``,
+          contact: `${userDetails?.phone_number}` || "" ,
         },
         theme: { color: "#ff6600" },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } else {
-      alert("Order placed with Cash on Delivery");
+    }  else {
+      setMessage("Order placed with Cash on Delivery");
       placeOrder("CoD");
     }
   };
-
-
 
   useEffect(() => {
     if (accessToken && storeId) {
@@ -135,7 +131,6 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
     }
   }
   
-
   return (
     <div className="checkout-container" style={{width: "100vw", display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>
 
@@ -179,25 +174,50 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
           /> Cash on Delivery
         </label>
       </div>
+      {message && (<p style={{ color: "green", fontWeight: "bold", marginTop: "10px" }}>
+        {message}
+      </p>)}
 
+    <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
       <button
         onClick={handlePayment}
         style={{
-          marginTop: "20px",
-          backgroundColor: "#000",
+          backgroundColor: "#222",
           color: "#fff",
           padding: "10px 20px",
           border: "none",
           cursor: "pointer",
+          borderRadius: "4.5px", 
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", 
+          transition: "all 0.2s ease-in-out", 
         }}
+        onMouseOver={(e) => (e.target.style.backgroundColor = "#111")}
+        onMouseOut={(e) => (e.target.style.backgroundColor = "#222")}
       >
         Confirm Order
       </button>
 
-      {message && <p style={{ marginTop: "15px", color: "green" }}>{message}</p>}
-    </div>
-    </div>
-
+      <button
+        onClick={() => navigate(`/menu/${storeId}`)}
+        style={{
+          backgroundColor: "#ff6600",
+          color: "#fff",
+          padding: "10px 20px",
+          border: "none",
+          cursor: "pointer",
+          borderRadius: "4.5px", 
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", 
+          transition: "all 0.2s ease-in-out", 
+        }}
+        onMouseOver={(e) => (e.target.style.backgroundColor = "#e65c00")}
+        onMouseOut={(e) => (e.target.style.backgroundColor = "#ff6600")}
+      >
+        Back to Cart
+      </button>
+   </div>
+     <ToastContainer/>
+  </div>
+  </div>
   );
 };
 

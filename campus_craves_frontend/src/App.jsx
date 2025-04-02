@@ -4,7 +4,6 @@ import Menu from "./pages/buyer/Menu"
 import Canteens from "./pages/buyer/Canteens"
 import Orders from "./pages/buyer/Orders";
 import BuyerProfile from "./pages/buyer/BuyerProfile"
-import CartPage from "./pages/buyer/CartPage";
 import CheckoutPage from "./pages/buyer/CheckoutPage";
 import SellerView from "./pages/seller/SellerView";
 import SignUp from "./login-signup/SignUp";
@@ -22,7 +21,6 @@ const App = () => {
         <Route path="/canteens" element={<Canteens />} />
         <Route path="/order" element={<Orders />} />
         <Route path="/profile" element={<BuyerProfile />} />
-        <Route path="/cart/:storeId" element={<CartPage />} />
         <Route path="/checkout/:storeId" element={<CheckoutPage />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />

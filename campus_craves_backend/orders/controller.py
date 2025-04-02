@@ -22,7 +22,7 @@ def send_email(to_email, subject, body):
         )
         sg.send(message)
     except Exception as e:
-        print(f"Failed to send email to {to_email}: {str(e)}")  # Log the error
+        print(f"Failed to send email to {to_email}: {str(e)}")  
 
 def checkout_cart(user, store, payment_method, address):
     try:
@@ -36,7 +36,6 @@ def checkout_cart(user, store, payment_method, address):
 
     total_price = sum(i.product.price * i.quantity for i in cart_items)
 
-    # Creation of order
     order = Order.objects.create(
         user=user,
         store=store,
@@ -45,7 +44,6 @@ def checkout_cart(user, store, payment_method, address):
         total_price=total_price,
     )
 
-    # Additon of items to the order
     for item in cart_items:
         OrderItem.objects.create(
             order=order,
@@ -54,10 +52,8 @@ def checkout_cart(user, store, payment_method, address):
             price=item.product.price
         )
 
-    # Clearing the cart
     cart.items.all().delete()
 
-    # Sending email notifications
     send_email(user.email, f"Order #{order.id} Placed!", "Your order has been successfully placed.")
     send_email(store.seller.email, f"New Order from {user.username}", f"You have received a new order #{order.id}.")
 
@@ -66,9 +62,9 @@ def checkout_cart(user, store, payment_method, address):
 
 def cancel_order(user, order):
     if order.user != user:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+        return False, "Unauthorized"
     if order.status == 'delivered':
-        return Response({"error": "Cannot cancel a delivered order"}, status=status.HTTP_400_BAD_REQUEST)
+        return False, "Cannot cancel a delivered order"
 
     order.status = 'cancelled'
     order.cancelled_at = timezone.now()
@@ -81,7 +77,7 @@ def cancel_order(user, order):
     send_email(user.email, f"Order #{order.id} Cancelled", user_message)
     send_email(order.store.seller.email, f"Order #{order.id} Cancelled", f"Order #{order.id} has been cancelled by the user.")
 
-    return Response({"message": "Order cancelled and notifications sent successfully."}, status=status.HTTP_200_OK)
+    return True, "Order cancelled successfully."
 
 
 def mark_order_delivered(order, seller):
