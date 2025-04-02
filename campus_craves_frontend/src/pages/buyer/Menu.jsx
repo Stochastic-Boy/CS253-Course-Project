@@ -19,6 +19,8 @@ const Menu = () => {
   const [message, setMessage] = useState("");
   const [newCart, setNewCart] = useState([]);
   const [sellerData, setSellerData] = useState({});
+  const [userDetails, setUserDetails] = useState({})
+  const [checkoutMessage, setCheckoutMessage] = useState("")
 
 
   const fetchProducts = async (categoryId) => {
@@ -122,6 +124,34 @@ const Menu = () => {
       fetchCart();
     }  
   }, [accessToken, storeId]); 
+
+
+  
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/users/profile/", {
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+      }
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        setUserDetails({ id: data.id, phone_number: data.phone_number, address: data.address });
+    })
+    .catch((error) => {
+        console.error("Error fetching user data:", error);
+    });
+  }, [])
+
+
+  const handleCheckout=()=> {
+    //No delivery address provided. Please enter an address in your profile or during checkout.
+    if(userDetails?.address == "") {
+      setCheckoutMessage('Delivery Location is missing!! Enter you location in your profile')
+    }
+    else{
+      navigate(`/checkout/${storeId}`);
+    }
+  }
   
   
 
@@ -202,7 +232,8 @@ const Menu = () => {
           )}
 
           <h3 className="mt-4">Total: ₹{newCart?.total_price || 0}</h3>
-          <button onClick={()=>navigate(`/checkout/${storeId}`)} className="checkout">Checkout →</button>
+          {checkoutMessage && <p style={{color:"rgb(255, 0, 0)"}}>{checkoutMessage}</p>}
+          <button onClick={handleCheckout} className="checkout">Checkout →</button>
         </aside>
 
 
