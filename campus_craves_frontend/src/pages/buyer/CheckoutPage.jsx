@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
+const Checkout = () => {
   const user = useSelector((state) => state.user.user);
   const { storeId } = useParams();
   const navigate = useNavigate();
@@ -35,16 +35,16 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
     document.body.appendChild(script);
   }, []);
 
-  const items = [
-    { name: "Paneer Tikka", price: 120, quantity: 1 },
-    { name: "Margherita Pizza", price: 200, quantity: 5 },
-    { name: "Hakka Noodles", price: 110, quantity: 1 },
-  ];
+  // const items = [
+  //   { name: "Paneer Tikka", price: 120, quantity: 1 },
+  //   { name: "Margherita Pizza", price: 200, quantity: 5 },
+  //   { name: "Hakka Noodles", price: 110, quantity: 1 },
+  // ];
 
-  const computedTotalAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // const computedTotalAmount = items.reduce(
+  //   (sum, item) => sum + item.price * item.quantity,
+  //   0
+  // );
 
   const placeOrder = async (method) => {
     try {
@@ -96,7 +96,7 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
         prefill: {
           name: `${user.username}`,
           email: `${user.email}`,
-          contact: ``,
+          contact: `${userDetails?.phone_number}` || "" ,
         },
         theme: { color: "#ff6600" },
       };
@@ -180,19 +180,35 @@ const Checkout = ({ deliveryAddress = "Hall 2, IIT Kanpur" }) => {
         </label>
       </div>
 
-      <button
-        onClick={handlePayment}
-        style={{
-          marginTop: "20px",
-          backgroundColor: "#000",
-          color: "#fff",
-          padding: "10px 20px",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Confirm Order
-      </button>
+      <div className="checkout-buttons" style={{display:"flex", gap:"30px"}}>
+        <button
+          onClick={handlePayment}
+          style={{
+            marginTop: "20px",
+            backgroundColor: "#000",
+            color: "#fff",
+            padding: "10px 20px",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Confirm Order
+        </button>
+
+        <button onClick={()=> navigate(`/menu/${storeId}`)}
+          style={{
+            marginTop: "20px",
+            backgroundColor: "rgb(255, 18, 18)",
+            color: "#fff",
+            padding: "10px 20px",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Go Back
+        </button>
+
+      </div>
 
       {message && <p style={{ marginTop: "15px", color: "green" }}>{message}</p>}
     </div>
