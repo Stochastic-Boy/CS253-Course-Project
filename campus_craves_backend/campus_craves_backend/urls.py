@@ -35,7 +35,6 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # User Authentication
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('', home, name='home'), 

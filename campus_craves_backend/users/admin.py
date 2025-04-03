@@ -3,7 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User, BuyerProfile, SellerProfile
 
 class CustomUserAdmin(UserAdmin):
-    """Customize Django Admin for User model"""
+    """ Customize Django Admin for User model """
+
     list_display = ('id', 'email', 'username', 'role', 'is_active', 'is_staff')
     list_filter = ('role', 'is_staff', 'is_active')
     search_fields = ('email', 'username')
@@ -22,7 +23,7 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
-# Register models
+""" Register models """
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(BuyerProfile)
 admin.site.register(SellerProfile)

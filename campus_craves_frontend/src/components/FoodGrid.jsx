@@ -18,7 +18,7 @@ const FoodGrid = () => {
 
   useEffect(() => {
     const updateGridSize = () => {
-      let cols = 5; // Default for large screens
+      let cols = 5; 
 
       if (window.innerWidth <= 1200) cols = 4; // Medium screens
       if (window.innerWidth <= 992) cols = 3; // Tablets
@@ -50,7 +50,6 @@ const FoodGrid = () => {
           >
             <img src={store.image || "/assets/canteenimg.png"} alt={store.name} className="food-image" />
             <div className="food-name">
-              {/* <h6 style={{ color: "rgb(44, 255, 251)", marginBottom: 0 }}>Store Id: {store.id}</h6> */}
               <h4>{store.name}</h4>
             </div>
           </div>

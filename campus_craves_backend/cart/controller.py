@@ -10,7 +10,6 @@ def get_cart_by_user(user, store_id):
     return cart
 
 def add_to_cart(user, product_id, quantity_change):
-    """Updates the quantity of an item in the user's cart or removes it if quantity reaches zero."""
     try:
         product = Product.objects.get(id=product_id)
     except Product.DoesNotExist:
@@ -35,8 +34,6 @@ def add_to_cart(user, product_id, quantity_change):
             return {"message": "Cannot decrease quantity below zero"}
 
     return cart_item
-
-
 
 def remove_from_cart(cart_item_id):
     try:

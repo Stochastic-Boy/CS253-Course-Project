@@ -18,7 +18,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, username, password):
-        """Create and return a superuser"""
         user = self.create_user(email, username, password, role="admin")
         user.is_staff = True
         user.is_superuser = True
@@ -37,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='buyer')
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)  # Required for Django Admin
+    is_staff = models.BooleanField(default=False)  # is True for Django Admin
 
     groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)

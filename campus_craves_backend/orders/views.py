@@ -3,11 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Order, Store
 from .serializers import OrderSerializer
-from .controller import checkout_cart, cancel_order, mark_order_delivered, send_email
+from .controller import checkout_cart, cancel_order, send_email
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 class CheckoutView(generics.CreateAPIView):
+    """ Handles order checkout and creation """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -36,8 +37,8 @@ class CheckoutView(generics.CreateAPIView):
 
         return Response({"message": "Order placed successfully", "orders": [order.id for order in orders]})
 
-
 class CancelOrderView(APIView):
+    """ Handles order cancellation """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -50,6 +51,7 @@ class CancelOrderView(APIView):
         return Response({"message": msg}, status=status.HTTP_200_OK)
 
 class ConfirmDeliveryView(generics.UpdateAPIView):
+    """ Marks an order as delivered """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -69,6 +71,7 @@ class ConfirmDeliveryView(generics.UpdateAPIView):
         return Response({"message": "Order Delivered."}, status=status.HTTP_200_OK)
 
 class UserOrderListView(generics.ListAPIView):
+    """ Lists all orders of a user """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -76,6 +79,7 @@ class UserOrderListView(generics.ListAPIView):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
 
 class SellerOrderListView(generics.ListAPIView):
+    """ Lists all orders for a seller """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 

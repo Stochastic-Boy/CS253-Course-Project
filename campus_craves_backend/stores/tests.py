@@ -5,10 +5,9 @@ from .models import Store
 User = get_user_model()
 
 class StoreTestCase(TestCase):
-    """Tests for Store model and API"""
 
     def setUp(self):
-        """Create a test seller and store"""
+        """ Create a test seller and store """
         self.seller = User.objects.create_user(email="seller@example.com", username="seller123", password="testpass", role="seller")
         self.store = Store.objects.create(
             seller=self.seller, 
@@ -18,6 +17,6 @@ class StoreTestCase(TestCase):
         )
 
     def test_store_creation(self):
-        """Check if store is created correctly"""
+        """ Check if store is created correctly """
         self.assertEqual(self.store.name, "Test Store")
         self.assertEqual(self.store.seller.username, "seller123")

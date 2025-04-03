@@ -6,6 +6,7 @@ from .serializers import StoreSerializer
 from .controller import create_store, get_all_stores, get_store_by_id, update_store, delete_store
 
 class StoreCreateView(generics.CreateAPIView):
+    """ Allows sellers to create a store """
     serializer_class = StoreSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -24,10 +25,12 @@ class StoreCreateView(generics.CreateAPIView):
         )
 
 class StoreListView(generics.ListAPIView):
+    """ Lists all available stores """
     queryset = get_all_stores()
     serializer_class = StoreSerializer
 
 class StoreDetailView(APIView):
+    """ Handles retrieving, updating, and deleting a store """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, store_id):   

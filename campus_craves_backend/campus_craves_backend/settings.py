@@ -23,10 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-izw6a7qom$w()%%mk6zx_rw2!xztn86xqf85jr&8!=c_nlk7bq'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# To be disabled in production
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -39,13 +38,12 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "apikey"  # SendGrid requires this as the username
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY  # Load from .env in production
+EMAIL_HOST_USER = "apikey" 
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY  
 DEFAULT_FROM_EMAIL = "campus.craves.iitk@gmail.com"
 
 
 # Application definition
-
 INSTALLED_APPS = [
     # Default Django apps
     'django.contrib.admin',
@@ -147,10 +145,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=365),  # Access token lasts 1 year
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # Refresh token lasts 1 year (optional)
-    'ROTATE_REFRESH_TOKENS': False,  # Disable refresh token rotation
-    'BLACKLIST_AFTER_ROTATION': False,  # Disable blacklisting after rotation
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=365),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  
+    'ROTATE_REFRESH_TOKENS': False, 
+    'BLACKLIST_AFTER_ROTATION': False,  
 }
 
 # Internationalization

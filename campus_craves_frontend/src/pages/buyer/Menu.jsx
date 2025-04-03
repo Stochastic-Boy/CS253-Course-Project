@@ -11,12 +11,10 @@ const Menu = () => {
   const accessToken = localStorage.getItem("access_token");
   
   const [store, setStore] = useState({});
-  const [cart, setCart] = useState([]);
   const [search, setSearch] = useState("");
   const [newCategories, setNewCategories] = useState([]);
   const [newSelectedCategory, setNewSelectedCategory] = useState("");
   const [products, setProducts] = useState([]);
-  const [message, setMessage] = useState("");
   const [newCart, setNewCart] = useState([]);
   const [sellerData, setSellerData] = useState({});
   const [userDetails, setUserDetails] = useState({})
@@ -59,7 +57,6 @@ const Menu = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
       });
       setSellerData(response.data);
-      // console.log(response.data);
     } catch (error) {
       console.error("Error fetching seller details:", error);
     }
@@ -142,9 +139,7 @@ const Menu = () => {
     });
   }, [])
 
-
   const handleCheckout=()=> {
-    //No delivery address provided. Please enter an address in your profile or during checkout.
     if(userDetails?.address == "") {
       setCheckoutMessage('Delivery Location is missing!! Enter you location in your profile')
     }
@@ -153,8 +148,6 @@ const Menu = () => {
     }
   }
   
-  
-
   return (
     <div className="menupage">
       <Header />
@@ -235,7 +228,6 @@ const Menu = () => {
           {checkoutMessage && <p style={{color:"rgb(255, 0, 0)"}}>{checkoutMessage}</p>}
           <button onClick={handleCheckout} className="checkout">Checkout →</button>
         </aside>
-
 
       </div>
     </div>

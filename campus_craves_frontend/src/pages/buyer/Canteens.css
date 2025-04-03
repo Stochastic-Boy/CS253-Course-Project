@@ -1,13 +1,9 @@
-
-
 .food {
   margin-top: 5vh;
   margin-left: 2vw;
   font-weight: 7000;
   font-size: clamp(16px, 2vw, 24px);
 }
-
-
 
 @media (max-width: 768px) {
 

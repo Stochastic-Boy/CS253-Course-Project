@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import './categoriesview.css';
 
@@ -14,7 +13,6 @@ const CategoriesView = () => {
   const navigate = useNavigate();
   const { sellerId } = useParams();
 
-  const user = useSelector((state) => state.user.user);
   const accessToken = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -142,7 +140,6 @@ const CategoriesView = () => {
               </div>
             </div>
 
-            {/* Show products only if category is open */}
             {openCategory === category.id && (
               <div className="products ml-4 mt-2">
                 {products.filter((product) => product.category === category.id)

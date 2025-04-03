@@ -4,12 +4,8 @@ from .models import Product, Category, Store
 from .serializers import ProductSerializer, CategorySerializer
 from rest_framework.exceptions import ValidationError
 
-
 class PublicCategoryListView(generics.ListAPIView):
-    """
-    Allows buyers (or anyone) to view product categories for a specific store.
-    No authentication required.
-    """
+    """ Allows buyers (or anyone) to view product categories for a store """
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
 
@@ -17,12 +13,8 @@ class PublicCategoryListView(generics.ListAPIView):
         store_id = self.kwargs.get('store_id')
         return Category.objects.filter(store__id=store_id)
 
-
 class PublicProductListView(generics.ListAPIView):
-    """
-    Allows buyers (or anyone) to view products within a specific category for a given store.
-    No authentication required.
-    """
+    """ Allows buyers (or anyone) to view products within a category for a given store """
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
 
@@ -34,13 +26,8 @@ class PublicProductListView(generics.ListAPIView):
 
         return Product.objects.filter(store__id=store_id, category__id=category_id)
     
-
-
 class ProductListCreateView(generics.ListCreateAPIView):
-    """
-    Allows sellers to view and add products to their store.
-    Only the authenticated seller can access and manage their products.
-    """
+    """ Allows sellers to view and add products to their store """
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
 
@@ -54,26 +41,16 @@ class ProductListCreateView(generics.ListCreateAPIView):
         except Store.DoesNotExist:
             raise ValidationError("Store does not exist for this seller.")
 
-
-
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Allows sellers to retrieve, update, or delete a specific product.
-    Only the authenticated seller can manage their own products.
-    """
+    """ Allows sellers to retrieve, update, or delete a specific product """
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Product.objects.filter(store__seller=self.request.user)
 
-
-
 class CategoryListCreateView(generics.ListCreateAPIView):
-    """
-    Allows sellers to view and create product categories for their store.
-    Only the authenticated seller can manage categories.
-    """
+    """ Allows sellers to view and create product categories for their store """
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 
@@ -87,13 +64,8 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         except Store.DoesNotExist:
             raise ValidationError("Store does not exist for this seller.")
 
-
-
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Allows sellers to retrieve, update, or delete a specific category.
-    Only the authenticated seller can manage their own categories.
-    """
+    """ Allows sellers to retrieve, update, or delete a specific category """
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
 

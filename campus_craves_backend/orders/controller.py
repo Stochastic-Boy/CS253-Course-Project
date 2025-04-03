@@ -7,11 +7,9 @@ from django.conf import settings
 import sendgrid
 from sendgrid.helpers.mail import Mail
 
-
 SENDGRID_API_KEY = getattr(settings, "SENDGRID_API_KEY", None)
 
 def send_email(to_email, subject, body):
-    """Helper function to send email using SendGrid"""
     try:
         sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
         message = Mail(
@@ -78,14 +76,3 @@ def cancel_order(user, order):
     send_email(order.store.seller.email, f"Order #{order.id} Cancelled", f"Order #{order.id} has been cancelled by the user.")
 
     return True, "Order cancelled successfully."
-
-
-def mark_order_delivered(order, seller):
-    if order.store.seller != seller:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
-
-    order.status = "delivered"
-    order.delivered_at = timezone.now()
-    order.save()
-    send_email(order.user.email, f"Order #{order.id} Delivered", "Your order has been successfully delivered!")
-    return Response({"message": "Order marked as delivered and notification sent."}, status=status.HTTP_200_OK)

@@ -55,7 +55,6 @@ const SignUp = () => {
         <input type="email" placeholder="Email" name="email" value={data.email} onChange={handleChange} />
         <input type="password" placeholder="Password" name="password" value={data.password} onChange={handleChange} />
 
-        {/* Role Selection (Radio Buttons) */}
         <div className="role-selection">
           <label>
             <input type="radio" name="role" value="buyer" checked={data.role === "buyer"} onChange={handleChange} />

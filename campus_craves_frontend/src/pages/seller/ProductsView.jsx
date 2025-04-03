@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const ProductsView = () => {
@@ -18,7 +17,6 @@ const ProductsView = () => {
   const [error, setError] = useState("");
 
   const accessToken = localStorage.getItem("access_token");
-  const user = useSelector((state) => state.user?.user);
 
   useEffect(() => {
     const fetchProducts = async () => {

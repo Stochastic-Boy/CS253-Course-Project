@@ -6,9 +6,7 @@ from .serializers import CartSerializer, CartItemSerializer
 from .controller import get_cart_by_user, add_to_cart, remove_from_cart, clear_cart
 
 class CartView(generics.RetrieveAPIView):
-    """
-    GET /cart/<store_id> => retrieve cart for a store
-    """
+    """ Retrieves the cart for a specific store """
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -17,10 +15,7 @@ class CartView(generics.RetrieveAPIView):
         return get_cart_by_user(self.request.user, store_id)
 
 class AddToCartView(APIView):
-    """
-    POST /cart/add/
-    Body: { product_id, quantity }
-    """
+    """ Adds a product to the user's cart """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -33,9 +28,7 @@ class AddToCartView(APIView):
         return Response({"error": "Product not found"}, status=404)
 
 class RemoveFromCartView(APIView):
-    """
-    DELETE /cart/item/<cart_item_id>/
-    """
+    """ Removes a specific item from the cart """
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, cart_item_id):
@@ -44,9 +37,7 @@ class RemoveFromCartView(APIView):
         return Response({"error": "Item not found"}, status=404)
 
 class ClearCartView(APIView):
-    """
-    DELETE /cart/clear/<store_id>/
-    """
+    """ Clears all items from the user's cart for a store """
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, store_id):

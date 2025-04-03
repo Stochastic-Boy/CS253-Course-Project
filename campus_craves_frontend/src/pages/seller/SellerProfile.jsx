@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
 const SellerProfileWithStores = () => {
   const user = useSelector((state) => state.user.user);
-  const navigate = useNavigate();
   const { sellerId } = useParams();
 
   const [fetchTrigger, setFetchTrigger] = useState(0);

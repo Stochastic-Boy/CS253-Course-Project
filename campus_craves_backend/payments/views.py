@@ -7,7 +7,7 @@ from orders.models import Order
 from .controller import create_payment, verify_payment, get_payment_by_order, process_refund
 
 class CreatePaymentView(APIView):
-    """Initiate payment with Razorpay"""
+    """ Initiate payment with Razorpay """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -25,7 +25,7 @@ class CreatePaymentView(APIView):
 
 
 class VerifyPaymentView(APIView):
-    """Verify a payment"""
+    """ Verify a payment """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
@@ -40,7 +40,7 @@ class VerifyPaymentView(APIView):
 
 
 class PaymentDetailView(APIView):
-    """Fetch payment details for an order"""
+    """ Fetch payment details for an order """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, order_id):
@@ -51,7 +51,7 @@ class PaymentDetailView(APIView):
 
 
 class RefundPaymentView(APIView):
-    """Process a refund for an order"""
+    """ Process a refund for an order """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, order_id):

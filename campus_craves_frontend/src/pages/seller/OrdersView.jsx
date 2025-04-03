@@ -4,10 +4,8 @@ import './Ordersview.css';
 
 const OrdersView = () => {
   const [orders, setOrders] = useState([]);
-  const [message, setMessage] = useState("");
   const [visibleOrders, setVisibleOrders] = useState(10);
   const accessToken = localStorage.getItem("access_token");
-  const [buyers, setBuyers] = useState([]);
 
   useEffect(() => {
     fetchSellerOrders();
@@ -52,30 +50,9 @@ const OrdersView = () => {
     }
   };
   
-  
-
-  const handleViewMore = () => {
-    setVisibleOrders((prev) => prev + 10);
-  };
-
-  // const markDelivered = async (orderId) => {
-  //   try {
-  //     const res = await axios.post(`http://127.0.0.1:8000/orders/deliver/${orderId}/`, {}, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     setMessage(res.data.message);
-  //     fetchSellerOrders();
-  //   } catch (err) {
-  //     console.error("Error marking delivered", err);
-  //   }
-  // };
-
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Store Orders</h2>
-      {message && <p className="text-green-600">{message}</p>}
       <div className="seller-orders">
 
        {orders.slice(0, visibleOrders).map((order) => (
@@ -100,19 +77,10 @@ const OrdersView = () => {
             ))}
           </ul>
 
-          {/* {order.status !== "delivered" && order.status !== "cancelled" && (
-            <button
-              onClick={() => markDelivered(order.id)}
-              className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
-            >
-              Mark as Delivered
-            </button>
-          )} */}
         </div>
        ))}
       </div>
 
-      {/* View More Button */}
     {orders.length > visibleOrders && (
       <div className="text-center my-4">
         <button

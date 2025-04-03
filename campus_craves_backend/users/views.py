@@ -11,7 +11,6 @@ from .models import User, BuyerProfile, SellerProfile
 from .serializers import UserSerializer, BuyerProfileSerializer, SellerProfileSerializer
 import random
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from .controller import get_user_by_email, create_user, authenticate_user
 from rest_framework.permissions import AllowAny
 import json
@@ -28,7 +27,10 @@ OTP_STORAGE = {}
 def home(request):
     return JsonResponse({"message": "Welcome to Campus Craves API!"})
 
+
 class RegisterUser(APIView):
+    """ Registers a new user """
+
     permission_classes = [AllowAny]
     def post(self, request):
         role = request.data.get('role')
@@ -59,6 +61,7 @@ class RegisterUser(APIView):
 
 
 class LoginUser(APIView):
+    """ Authenticates user and provides JWT tokens """
     permission_classes = [AllowAny]
     def post(self, request):
         email = request.data.get('email')
@@ -80,13 +83,16 @@ class LoginUser(APIView):
 
 
 class LogoutUser(APIView):
+    """ Logs out the user """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         logout(request)
         return Response({"message": "Logout successful."}, status=status.HTTP_200_OK)
 
+
 class UserProfile(RetrieveUpdateDestroyAPIView):
+    """ Allows authenticated users to retrieve, update, or delete their profile """
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
@@ -103,8 +109,8 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
         serializer.save(user=self.request.user)
 
 
-
 class GetUserDetails(APIView):
+    """ Retrieves user details and profile """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, user_id):
@@ -123,9 +129,8 @@ class GetUserDetails(APIView):
         }, status=status.HTTP_200_OK)
 
 
-
-        
 class SendOTP(APIView):
+    """ Sends OTP for password reset """
     def post(self, request):
         email = request.data.get('email')
         user = get_user_by_email(email)
@@ -157,6 +162,7 @@ class SendOTP(APIView):
 
 
 class SignupOTP(APIView):
+    """ Sends OTP for email verification at Signup """
     def post(self, request):
         email = request.data.get('email')
 
@@ -191,6 +197,7 @@ class SignupOTP(APIView):
 
 
 class VerifyOTP(APIView):
+    """ Verifies OTP """
     def post(self, request):
         email = request.data.get('email')
         otp = int(request.data.get('otp'))
@@ -202,8 +209,8 @@ class VerifyOTP(APIView):
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class ResetPassword(APIView):
+    """ Resets user password after OTP verification """
     def post(self, request):
         email = request.data.get('email')
         otp = int(request.data.get('otp'))
@@ -223,21 +230,3 @@ class ResetPassword(APIView):
             return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
 
         return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
-
-
-@csrf_exempt
-def user_login(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user = authenticate_user(data["email"], data["password"])
-        if user:
-            return JsonResponse({"message": "Login successful", "user_id": user.id})
-        return JsonResponse({"error": "Invalid credentials"}, status=400)
-
-
-@csrf_exempt
-def user_signup(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user = create_user(data["email"], data["username"], data["password"], data["role"])
-        return JsonResponse({"message": "User created", "user_id": user.id})

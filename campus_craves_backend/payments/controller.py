@@ -6,9 +6,7 @@ from orders.models import Order
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-
 def create_payment(user, order, method, amount):
-    """Initiate a payment for an order."""
     payment = Payment.objects.create(user=user, order=order, method=method)
     
     if method != "COD":
@@ -24,7 +22,6 @@ def create_payment(user, order, method, amount):
 
 
 def verify_payment(payment_id, razorpay_payment_id, razorpay_signature):
-    """Verify Razorpay payment."""
     params_dict = {
         "razorpay_order_id": payment_id,
         "razorpay_payment_id": razorpay_payment_id,
@@ -42,7 +39,6 @@ def verify_payment(payment_id, razorpay_payment_id, razorpay_signature):
 
 
 def get_payment_by_order(order_id):
-    """Retrieve payment details for an order."""
     try:
         return Payment.objects.get(order_id=order_id)
     except ObjectDoesNotExist:
@@ -50,7 +46,6 @@ def get_payment_by_order(order_id):
 
 
 def process_refund(order_id):
-    """Process a refund for a payment."""
     try:
         payment = Payment.objects.get(order_id=order_id)
         if payment.method != "COD":

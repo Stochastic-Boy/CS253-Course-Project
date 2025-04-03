@@ -43,8 +43,8 @@ const BuyerProfile = () => {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 },
                 body: JSON.stringify({
-                    phone_number: userDetails.phone_number || "", // Ensures no null values
-                    address: userDetails.address || "",          // Ensures no null values
+                    phone_number: userDetails.phone_number || "", 
+                    address: userDetails.address || "",          
                 }),
             })
                 .then((response) => response.json())
