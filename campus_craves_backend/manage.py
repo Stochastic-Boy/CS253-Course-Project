@@ -2,11 +2,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-import celery
-celery_app = celery.Celery('campus_craves_backend')
-celery_app.config_from_object('django.conf:settings', namespace='CELERY')
-celery_app.autodiscover_tasks()
-
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'campus_craves_backend.settings')

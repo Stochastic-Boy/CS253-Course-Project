@@ -24,14 +24,23 @@ class CheckoutView(generics.CreateAPIView):
                 address = None
 
         if not address:
-            return Response({"error": "No delivery address provided. Please enter an address in your profile or during checkout."}, status=400)
+            return Response({"error": "No delivery address provided. Please enter an address in your profile."}, status=400)
+        
+        
+        try:
+            phone_number = request.user.buyer_profile.phone_number
+        except AttributeError:
+            phone_number = None
+
+        if not phone_number:
+            return Response({"error": "No phone number provided. Please add a phone number to your profile to place an order."}, status=400)
 
         try:
             store = Store.objects.get(id=store_id)
         except Store.DoesNotExist:
             return Response({"error": "Invalid store ID. Store does not exist."}, status=400)
 
-        orders, error = checkout_cart(request.user, store, payment_method, address)
+        orders, error = checkout_cart(request.user, store, payment_method, address, phone_number)
         if error:
             return Response({"error": error}, status=400)
 
@@ -57,10 +66,8 @@ class ConfirmDeliveryView(generics.UpdateAPIView):
 
     def post(self, request, pk):
         order = get_object_or_404(Order, pk=pk, user=request.user)
-
         if order.status == "delivered":
-            return Response({"message": "Order already marked as delivered."}, status=status.HTTP_200_OK)
-
+            return Response({"error": "Order already marked as delivered."}, status=status.HTTP_400_BAD_REQUEST)
         order.status = "delivered"
         order.delivered_at = timezone.now()
         order.save()

@@ -22,7 +22,7 @@ def send_email(to_email, subject, body):
     except Exception as e:
         print(f"Failed to send email to {to_email}: {str(e)}")  
 
-def checkout_cart(user, store, payment_method, address):
+def checkout_cart(user, store, payment_method, address, phone_number):
     try:
         cart = Cart.objects.get(buyer=user, store=store)  
     except Cart.DoesNotExist:
@@ -40,6 +40,7 @@ def checkout_cart(user, store, payment_method, address):
         payment_method=payment_method,
         delivery_address=address,
         total_price=total_price,
+        phone_number=phone_number
     )
 
     for item in cart_items:

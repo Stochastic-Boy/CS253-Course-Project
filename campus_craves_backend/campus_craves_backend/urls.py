@@ -23,17 +23,6 @@ from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
 
 
-# Swagger Schema View
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Campus Craves API",
-        default_version='v1',
-        description="API Documentation",
-    ),
-    public=True,
-    permission_classes=(AllowAny,),
-)
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
@@ -43,7 +32,4 @@ urlpatterns = [
     path('cart/', include('cart.urls')),
     path('orders/', include('orders.urls')),
     path('payments/', include('payments.urls')),
-   
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='redoc-docs'),
 ]

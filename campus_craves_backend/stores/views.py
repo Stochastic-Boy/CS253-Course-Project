@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Store
+from django.core.exceptions import PermissionDenied
 from .serializers import StoreSerializer
 from .controller import create_store, get_all_stores, get_store_by_id, update_store, delete_store
 
@@ -12,6 +13,9 @@ class StoreCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         seller = self.request.user
+
+        if getattr(seller, "role", None) != "seller":  
+            raise PermissionDenied("Only sellers can create a store.")
 
         if Store.objects.filter(seller=seller).exists():
             raise serializers.ValidationError("You can only have one store.")

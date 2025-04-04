@@ -19,6 +19,7 @@ import random
 import sendgrid
 from sendgrid.helpers.mail import Mail
 from django.contrib.auth.hashers import make_password
+from rest_framework.exceptions import ValidationError
 
 SENDGRID_API_KEY = getattr(settings, "SENDGRID_API_KEY", None)
 
@@ -106,6 +107,9 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
         return get_object_or_404(SellerProfile, user=self.request.user)
 
     def perform_update(self, serializer):  
+        if not self.request.data:
+            raise ValidationError({"error": "No updates provided "})
+
         serializer.save(user=self.request.user)
 
 

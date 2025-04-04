@@ -8,7 +8,6 @@ client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_S
 
 def create_payment(user, order, method, amount):
     payment = Payment.objects.create(user=user, order=order, method=method)
-    
     if method != "COD":
         razorpay_order = client.order.create({
             "amount": int(amount * 100),

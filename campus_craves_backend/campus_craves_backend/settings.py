@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import pdfkit
-
 from datetime import timedelta
 
 
@@ -27,7 +25,6 @@ SECRET_KEY = 'django-insecure-izw6a7qom$w()%%mk6zx_rw2!xztn86xqf85jr&8!=c_nlk7bq
 
 # To be disabled in production
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 # Store API key
@@ -57,11 +54,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders', 
     'rest_framework_simplejwt',
-    'drf_yasg',
     'django_extensions',
     'channels',
-    'django_celery_results',
-    'django_celery_beat',
 
     # Custom apps
     'users',        
@@ -158,7 +152,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-PDFKIT_CONFIG = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
 RAZORPAY_KEY_ID = "your_razorpay_key_id"
 RAZORPAY_KEY_SECRET = "your_razorpay_key_secret"
 
@@ -177,12 +170,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "https://yourfrontenddomain.com",
+    "https://campuscraves.cse.iitk.ac.in",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
-    "https://yourfrontenddomain.com",
+    "https://campuscraves.cse.iitk.ac.in",
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -193,27 +186,4 @@ CHANNEL_LAYERS = {
     },
 }
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_BACKEND = 'django-db'
-
-SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
-    'SECURITY_DEFINITIONS': {
-        'API Key': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
-}
-
 ASGI_APPLICATION = 'campus_craves_backend.asgi.application'
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',
-    }
-}
