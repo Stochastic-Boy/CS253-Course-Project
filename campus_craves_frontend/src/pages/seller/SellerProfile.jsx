@@ -16,6 +16,7 @@ const SellerProfileWithStores = () => {
     image: "/assets/profile.png",
   });
 
+  const [phoneError, setPhoneError] = useState("");
   const [stores, setStores] = useState([]);
   const [storeId, setStoreId] = useState(null);
   const [editingStore, setEditingStore] = useState(null);
@@ -60,6 +61,12 @@ const SellerProfileWithStores = () => {
       setStoreId(null);
     }
   }, [stores]);
+
+  // Validate Indian phone number (10 digits)
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
 
   const handleCreateStore = async () => {
     try {
@@ -111,15 +118,31 @@ const SellerProfileWithStores = () => {
     const { name, value } = e.target;
   
     if (name === "contact_number") {
+      // Only allow digits to be entered
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Check length for phone validation
+      if (digitsOnly.length > 0 && digitsOnly.length !== 10) {
+        setPhoneError("Phone number must be exactly 10 digits");
+      } else {
+        setPhoneError("");
+      }
+      
       setSellerData((prevData) => ({
         ...prevData,
-        contact_number: value,
+        contact_number: digitsOnly,
       }));
     }
   };
   
   const toggleEdit = () => {
     if (isEditing) {
+      // Validate phone number before saving
+      if (sellerData.contact_number && !validatePhoneNumber(sellerData.contact_number)) {
+        setPhoneError("Phone number must be exactly 10 digits");
+        return;
+      }
+      
       axios.put("http://127.0.0.1:8000/users/profile/", sellerData, {
         headers: {
           "Content-Type": "application/json",
@@ -132,6 +155,12 @@ const SellerProfileWithStores = () => {
     setIsEditing(!isEditing);
   };
 
+  const errorStyle = {
+    color: "#ff6b6b",
+    fontSize: "12px",
+    margin: "5px 0"
+  };
+
   return (
     <div style={{ height: "100vh", backgroundColor: "#2b2b2b", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
       <div style={{ width: "350px", backgroundColor: "#333", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", textAlign: "center", padding: "20px" }}>
@@ -142,15 +171,19 @@ const SellerProfileWithStores = () => {
         <div className="store-name my-1"><strong>{user.email}</strong></div>
         
         <p className="mt-4"><strong>Contact:</strong> {isEditing ? (
-          <input 
-          type="text" 
-          name="contact_number" 
-          value={sellerData.contact_number || ""} 
-          onChange={handleChange} 
-          style={{ width: "100%", padding: "5px", fontSize: "16px", textAlign: "center", backgroundColor: "#616161", color: "white", border: "none", borderRadius: "5px" }} />
+          <>
+            <input 
+              type="text" 
+              name="contact_number" 
+              value={sellerData.contact_number || ""} 
+              onChange={handleChange}
+              maxLength={10} 
+              style={{ width: "100%", padding: "5px", fontSize: "16px", textAlign: "center", backgroundColor: "#616161", color: "white", border: "none", borderRadius: "5px" }} />
+            {phoneError && <div style={errorStyle}>{phoneError}</div>}
+          </>
         ) : sellerData.contact_number}</p>
         
-        <button onClick={toggleEdit} style={{ marginTop: "10px", padding: "8px 16px", fontSize: "16px", cursor: "pointer", border: "none", borderRadius: "5px", backgroundColor: isEditing ? "#4caf50" : "#ff9800", color: "white" }}>
+        <button onClick={toggleEdit} style={{ marginTop: "10px", padding: "8px 16px", fontSize: "16px", cursor: "pointer", border: "none", borderRadius: "5px", backgroundColor: isEditing ? "#4caf50" : "#ff9800", color: "white" }} disabled={isEditing && phoneError}>
           {isEditing ? "Save" : "Edit"}
         </button>
       </div>

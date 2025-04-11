@@ -5,7 +5,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255)
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='categories')
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
 class Product(models.Model):
@@ -15,6 +15,9 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='products')
 
-    def _str_(self):
+    class Meta:
+        # This ensures that for a given category, the combination of name and description must be unique
+        unique_together = ['name', 'description', 'category']
+
+    def __str__(self):
         return self.name
-    

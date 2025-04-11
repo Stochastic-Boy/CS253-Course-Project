@@ -102,7 +102,6 @@ const Checkout = () => {
       const rzp = new window.Razorpay(options);
       rzp.open();
     }  else {
-      setMessage("Order placed with Cash on Delivery");
       placeOrder("CoD");
     }
   };

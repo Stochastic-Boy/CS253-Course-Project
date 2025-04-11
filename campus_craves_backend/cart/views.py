@@ -22,10 +22,21 @@ class AddToCartView(APIView):
         product_id = request.data.get("product_id")
         quantity = int(request.data.get("quantity", 1))
 
-        cart_item = add_to_cart(request.user, product_id, quantity)
-        if cart_item:
-            return Response({"message": "Item added", "cart_item": CartItemSerializer(cart_item).data})
-        return Response({"error": "Product not found"}, status=404)
+        result = add_to_cart(request.user, product_id, quantity)
+        
+        if result is None:
+            return Response({"error": "Product not found"}, status=404)
+        
+        # Check if the result is a message dictionary
+        if isinstance(result, dict) and "message" in result:
+            return Response(result)
+        
+        # Otherwise, it's a CartItem object
+        return Response({
+            "message": "Item added" if quantity > 0 else "Item quantity updated",
+            "cart_item": CartItemSerializer(result).data
+        })
+
 
 class RemoveFromCartView(APIView):
     """ Removes a specific item from the cart """

@@ -20,14 +20,21 @@ class Order(models.Model):
     cancelled_at = models.DateTimeField(null=True, blank=True)
     delivered_at = models.DateTimeField(null=True, blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=255, null=True)  # Make nullable initially
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def _str_(self):
-        return f"{self.product.name} x {self.quantity}"
+    def save(self, *args, **kwargs):
+        # Automatically populate product_name from the related product
+        if self.product and not self.product_name:
+            self.product_name = self.product.name
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product_name} x {self.quantity}"

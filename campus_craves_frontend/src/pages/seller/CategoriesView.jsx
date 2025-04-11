@@ -113,7 +113,6 @@ const CategoriesView = () => {
         {categories.map((category) => (
           <div key={category.id} className="category mb-4">
             <div className="category-product-list mb-1 pb-1 flex justify-between items-center">
-              {/*  Added clickable category name with toggle arrow */}
               <span 
                 className="categoryName cursor-pointer flex items-center gap-2"
                 onClick={() => toggleCategory(category.id)}
@@ -143,8 +142,13 @@ const CategoriesView = () => {
             {openCategory === category.id && (
               <div className="products ml-4 mt-2">
                 {products.filter((product) => product.category === category.id)
-                  .map((product, index) => (
-                    <li key={index}>{product.name}</li>
+                  .map((product) => (
+                    <li key={product.id} className="mb-2">
+                      <strong>{product.name}</strong> - ₹{product.price}
+                      {product.description && (
+                        <p className="text-sm text-gray-600 ml-2">{product.description}</p>
+                      )}
+                    </li>
                 ))}
               </div>
             )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import { useSelector } from "react-redux";
 
@@ -8,6 +8,7 @@ const BuyerProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [phoneError, setPhoneError] = useState("");
 
     useEffect(() => {
         fetch("http://127.0.0.1:8000/users/profile/", {
@@ -27,14 +28,40 @@ const BuyerProfile = () => {
             });
     }, []);
 
+    // Validate Indian phone number (10 digits)
+    const validatePhoneNumber = (phone) => {
+        const phoneRegex = /^\d{10}$/;
+        return phoneRegex.test(phone);
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUserDetails({ ...userDetails, [name]: value || "" });
+        
+        if (name === "phone_number") {
+            // Only allow digits to be entered
+            const digitsOnly = value.replace(/\D/g, '');
+            
+            // Check length for phone validation
+            if (digitsOnly.length > 0 && digitsOnly.length !== 10) {
+                setPhoneError("Phone number must be exactly 10 digits");
+            } else {
+                setPhoneError("");
+            }
+            
+            setUserDetails({ ...userDetails, [name]: digitsOnly });
+        } else {
+            setUserDetails({ ...userDetails, [name]: value || "" });
+        }
     };
-    
 
     const toggleEdit = () => {
         if (isEditing) {
+            // Validate phone number before saving
+            if (userDetails.phone_number && !validatePhoneNumber(userDetails.phone_number)) {
+                setPhoneError("Phone number must be exactly 10 digits");
+                return;
+            }
+            
             fetch("http://127.0.0.1:8000/users/profile/", {
                 method: "PUT",
                 headers: {
@@ -43,8 +70,8 @@ const BuyerProfile = () => {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 },
                 body: JSON.stringify({
-                    phone_number: userDetails.phone_number || "", 
-                    address: userDetails.address || "",          
+                    phone_number: userDetails.phone_number || "",
+                    address: userDetails.address || "",
                 }),
             })
                 .then((response) => response.json())
@@ -55,7 +82,6 @@ const BuyerProfile = () => {
         }
         setIsEditing(!isEditing);
     };
-    
 
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">{error}</div>;
@@ -64,7 +90,7 @@ const BuyerProfile = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        height:"calc(100vh - 60px)",
+        height: "calc(100vh - 60px)",
         justifyContent: "center",
         backgroundColor: "#2c2c2c",
         padding: "auto",
@@ -132,6 +158,12 @@ const BuyerProfile = () => {
         borderRadius: "5px"
     };
 
+    const errorStyle = {
+        color: "#ff6b6b",
+        fontSize: "12px",
+        margin: "5px 0"
+    };
+
     const buttonStyle = {
         marginTop: "10px",
         padding: "8px 16px",
@@ -145,50 +177,56 @@ const BuyerProfile = () => {
 
     return (
         <div>
-            <Header/>
-        <div style={containerStyle}>
-            <div style={profileCardStyle}>
-                <div style={bannerStyle}></div>
-                <div style={imageContainerStyle}>
-                <img src="/assets/profile.png" alt="Profile Icon" style={imageStyle} />
-                </div>
-                <div style={detailsStyle}>
-                <p>
-                    <div className="username my-2"><strong>Username: </strong>{user.username}</div>
-                    <div className="email my-2"><strong>Email: </strong>{user.email}</div>
-                    <strong>Phone Number: </strong>
-                    {isEditing ? (
-                        <input 
-                            type="text" 
-                            name="phone_number" 
-                            value={userDetails.phone_number} 
-                            onChange={handleChange} 
-                            className="input-field" 
-                        />
-                    ) : (
-                        userDetails.phone_number
-                    )}
-                </p>
-                <p>
-                    <strong>Current Address: </strong>
-                    {isEditing ? (
-                        <input 
-                            type="text" 
-                            name="address" 
-                            value={userDetails.address} 
-                            onChange={handleChange} 
-                            className="input-field" 
-                        />
-                    ) : (
-                        userDetails.address
-                    )}
-                </p>
-                <button style={buttonStyle} onClick={toggleEdit}>
-                    {isEditing ? "Save" : "Edit"}
-                </button>
+            <Header />
+            <div style={containerStyle}>
+                <div style={profileCardStyle}>
+                    <div style={bannerStyle}></div>
+                    <div style={imageContainerStyle}>
+                        <img src="/assets/profile.png" alt="Profile Icon" style={imageStyle} />
+                    </div>
+                    <div style={detailsStyle}>
+                        <p>
+                            <div className="username my-2"><strong>Username: </strong>{user.username}</div>
+                            <div className="email my-2"><strong>Email: </strong>{user.email}</div>
+                            <strong>Phone Number: </strong>
+                            {isEditing ? (
+                                <>
+                                    <input
+                                        type="text"
+                                        name="phone_number"
+                                        value={userDetails.phone_number}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                        maxLength={10}
+                                        style={inputStyle}
+                                    />
+                                    {phoneError && <div style={errorStyle}>{phoneError}</div>}
+                                </>
+                            ) : (
+                                userDetails.phone_number
+                            )}
+                        </p>
+                        <p>
+                            <strong>Current Address: </strong>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={userDetails.address}
+                                    onChange={handleChange}
+                                    className="input-field"
+                                    style={inputStyle}
+                                />
+                            ) : (
+                                userDetails.address
+                            )}
+                        </p>
+                        <button style={buttonStyle} onClick={toggleEdit} disabled={isEditing && phoneError}>
+                            {isEditing ? "Save" : "Edit"}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     );
 };

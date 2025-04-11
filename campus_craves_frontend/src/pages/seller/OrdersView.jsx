@@ -50,6 +50,22 @@ const OrdersView = () => {
     }
   };
   
+  // Helper function to display product name, handling deleted products
+  const getProductName = (item) => {
+    if (item.product_details) {
+      return item.product_details.name;
+    } else if (item.product_info) {
+      return `${item.product_info.name} (deleted)`;
+    }
+    return "Product no longer available";
+  };
+  
+  // Helper function to calculate item price, handling deleted products
+  const getItemPrice = (item) => {
+    const price = item.product_details ? item.product_details.price : (item.product_info ? item.product_info.price : item.price);
+    return price * item.quantity;
+  };
+  
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Store Orders</h2>
@@ -72,7 +88,7 @@ const OrdersView = () => {
           <ul className="ml-4 mt-2">
             {order.items.map((item) => (
               <li style={{color: "rgb(111, 255, 250)"}} key={item.id}>
-                {item.product_details.name} × {item.quantity} = ₹{item.price * item.quantity}
+                {getProductName(item)} × {item.quantity} = ₹{getItemPrice(item)}
               </li>
             ))}
           </ul>

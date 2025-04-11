@@ -49,9 +49,35 @@ const ProductsView = () => {
     fetchCategories();
   }, [accessToken, categoryIdNum]); 
 
-  const handleAddProduct = async () => {
+  const validateProduct = () => {
     if (!newProduct.name || !newProduct.category || !newProduct.price) {
       setError("Name, price, and category are required.");
+      return false;
+    }
+    
+    // Validate price is not negative
+    if (parseFloat(newProduct.price) < 0) {
+      setError("Price cannot be negative.");
+      return false;
+    }
+    
+    // Check for duplicates
+    const isDuplicate = products.some(product => 
+      product.name === newProduct.name && 
+      product.description === newProduct.description && 
+      product.category === newProduct.category
+    );
+    
+    if (isDuplicate) {
+      setError("A product with the same name and description already exists in this category.");
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleAddProduct = async () => {
+    if (!validateProduct()) {
       return;
     }
 
@@ -71,7 +97,18 @@ const ProductsView = () => {
       setError("");
     } catch (err) {
       console.error("Error adding product:", err);
-      setError("Failed to add product.");
+      if (err.response && err.response.data) {
+        // Handle specific server validation errors
+        if (err.response.data.price) {
+          setError(`Price error: ${err.response.data.price[0]}`);
+        } else if (err.response.data.non_field_errors) {
+          setError(err.response.data.non_field_errors[0]);
+        } else {
+          setError("Failed to add product. Please check your inputs.");
+        }
+      } else {
+        setError("Failed to add product. Please try again.");
+      }
     }
   };
 
@@ -112,6 +149,8 @@ const ProductsView = () => {
         <input
           type="number"
           placeholder="Price"
+          min="0"
+          step="0.01"
           className="border px-2 py-1 mr-2"
           value={newProduct.price}
           onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}

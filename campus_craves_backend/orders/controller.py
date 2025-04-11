@@ -43,10 +43,14 @@ def checkout_cart(user, store, payment_method, address, phone_number):
         phone_number=phone_number
     )
 
+
+
     for item in cart_items:
+        
         OrderItem.objects.create(
             order=order,
             product=item.product,
+            product_name=item.product.name,  # Add the product_name field
             quantity=item.quantity,
             price=item.product.price
         )
@@ -56,7 +60,7 @@ def checkout_cart(user, store, payment_method, address, phone_number):
     send_email(user.email, f"Order #{order.id} Placed!", "Your order has been successfully placed.")
     send_email(store.seller.email, f"New Order from {user.username}", f"You have received a new order #{order.id}.")
 
-    return [order], None  
+    return [order], None
 
 
 def cancel_order(user, order):

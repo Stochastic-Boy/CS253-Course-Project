@@ -13,6 +13,7 @@ class PublicCategoryListView(generics.ListAPIView):
         store_id = self.kwargs.get('store_id')
         return Category.objects.filter(store__id=store_id)
 
+
 class PublicProductListView(generics.ListAPIView):
     """ Allows buyers (or anyone) to view products within a category for a given store """
     serializer_class = ProductSerializer
@@ -25,7 +26,7 @@ class PublicProductListView(generics.ListAPIView):
             raise ValidationError("Both store_id and category_id are required.")
 
         return Product.objects.filter(store__id=store_id, category__id=category_id)
-    
+
 class ProductListCreateView(generics.ListCreateAPIView):
     """ Allows sellers to view and add products to their store """
     serializer_class = ProductSerializer
