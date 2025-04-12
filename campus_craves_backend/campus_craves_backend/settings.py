@@ -9,26 +9,26 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv()
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-SECRET_KEY = 'django-insecure-izw6a7qom$w()%%mk6zx_rw2!xztn86xqf85jr&8!=c_nlk7bq'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # To be disabled in production
 DEBUG = True
 ALLOWED_HOSTS = []
-
-# Store API key
-SENDGRID_API_KEY = "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"
 
 # Email Configuration using SendGrid
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

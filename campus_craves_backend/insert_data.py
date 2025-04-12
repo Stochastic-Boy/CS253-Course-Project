@@ -18,12 +18,12 @@ cursor = conn.cursor()
 
 users = [
     ("admin@example.com", "admin", "admin_password", "admin", True, True, True),
-    ("buyer@example.com", "buyer1", "buyer_password", "buyer", True, False, False),
-    ("seller@example.com", "seller1", "seller_password", "seller", True, False, False),
-    ("buyertwo@example.com", "buyer2", "buyer_two", "buyer", True, False, False),
-    ("sellertwo@example.com", "seller2", "seller_two", "seller", True, False, False),
-    ("buyerthree@example.com", "buyer3", "buyer_two", "buyer", True, False, False),
-    ("sellerthree@example.com", "seller3", "seller_three", "seller", True, False, False),
+    ("buyer1@example.com", "buyer1", "buyer_one", "buyer", True, False, False),
+    ("seller1@example.com", "seller1", "seller_one", "seller", True, False, False),
+    ("buyer2@example.com", "buyer2", "buyer_two", "buyer", True, False, False),
+    ("seller2@example.com", "seller2", "seller_two", "seller", True, False, False),
+    ("buyer3@example.com", "buyer3", "buyer_two", "buyer", True, False, False),
+    ("seller3@example.com", "seller3", "seller_three", "seller", True, False, False),
 ]
 
 for email, username, password, role, is_active, is_staff, is_superuser in users:
@@ -34,9 +34,9 @@ for email, username, password, role, is_active, is_staff, is_superuser in users:
     )
 
 buyer_profiles = [
-    ('1234567890', 'D520, Hall 6', 2),
-    ('2345678901', 'C311, Hall 12', 4),
-    ('3456789012', 'D105, Hall 9', 6),
+    ('1234567890', 'B106, Hall 6', 2),
+    ('2345678901', 'C305, Hall 12', 4),
+    ('3456789012', 'A205, Hall 2', 6),
 ]
 
 for phone, address, user_id in buyer_profiles:
@@ -53,9 +53,11 @@ store_ids = []
 
 for i, seller_id in enumerate(seller_ids):
     store_name = store_names[i]
+    location = f"{store_name} Canteen, IIT Kanpur"
+    description = f"{store_name} Canteen serving IITK students."
     cursor.execute(
         "INSERT INTO stores_store (name, description, location, status, seller_id) VALUES (?, ?, ?, ?, ?)",
-        (store_name, f"Description for {store_name}", "Some Location", "open", seller_id),
+        (store_name, description, location, "open", seller_id),
     )
     store_ids.append(cursor.lastrowid)
 

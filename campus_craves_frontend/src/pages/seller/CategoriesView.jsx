@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import './categoriesview.css';
+import './CategoriesView.css';
 
 const CategoriesView = () => {
   const [categories, setCategories] = useState([]);
