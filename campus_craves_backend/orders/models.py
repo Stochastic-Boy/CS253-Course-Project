@@ -34,6 +34,7 @@ class OrderItem(models.Model):
         # Automatically populate product_name from the related product
         if self.product and not self.product_name:
             self.product_name = self.product.name
+            self.price = self.product.price 
         super().save(*args, **kwargs)
 
     def __str__(self):

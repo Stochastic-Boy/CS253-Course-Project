@@ -44,7 +44,6 @@ def checkout_cart(user, store, payment_method, address, phone_number):
     )
 
 
-
     for item in cart_items:
         
         OrderItem.objects.create(

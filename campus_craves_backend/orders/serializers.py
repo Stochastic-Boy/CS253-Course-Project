@@ -4,7 +4,6 @@ from products.serializers import ProductSerializer
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_details = ProductSerializer(source='product', read_only=True)
-    # Add fallback for deleted products
     product_info = serializers.SerializerMethodField()
 
     class Meta:

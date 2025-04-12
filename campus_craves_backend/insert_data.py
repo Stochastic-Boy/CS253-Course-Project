@@ -56,8 +56,8 @@ for i, seller_id in enumerate(seller_ids):
     location = f"{store_name} Canteen, IIT Kanpur"
     description = f"{store_name} Canteen serving IITK students."
     cursor.execute(
-        "INSERT INTO stores_store (name, description, location, status, seller_id) VALUES (?, ?, ?, ?, ?)",
-        (store_name, description, location, "open", seller_id),
+        "INSERT INTO stores_store (name, description, location, status, seller_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?)",
+        (store_name, description, location, "open", seller_id, 0),
     )
     store_ids.append(cursor.lastrowid)
 
@@ -88,8 +88,8 @@ for i, store_id in enumerate(store_ids):
     
     for category_name in [category1, category2]:
         cursor.execute(
-            "INSERT INTO products_category (name, store_id) VALUES (?, ?)",
-            (category_name, store_id),
+            "INSERT INTO products_category (name, store_id, is_deleted) VALUES (?, ?, ?)",
+            (category_name, store_id, 0),
         )
         category_ids.append(cursor.lastrowid)
 
@@ -108,8 +108,8 @@ for i, category_id in enumerate(category_ids):
     category_name = food_categories[i]  
     for product_name, product_desc, product_price in food_products[category_name]:
         cursor.execute(
-            "INSERT INTO products_product (name, description, price, category_id, store_id) VALUES (?, ?, ?, ?, ?)",
-            (product_name, product_desc, product_price, category_id, store_ids[i // 2]),
+            "INSERT INTO products_product (name, description, price, category_id, store_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?)",
+            (product_name, product_desc, product_price, category_id, store_ids[i // 2], 0),
         )
 
 conn.commit()

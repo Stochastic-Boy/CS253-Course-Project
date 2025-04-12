@@ -36,12 +36,11 @@ class ProductListCreateView(generics.ListCreateAPIView):
         return Product.objects.filter(store__seller=self.request.user)
 
     def perform_create(self, serializer):
-        try:
-            store = Store.objects.get(seller=self.request.user)
+            store = Store.objects.filter(seller=self.request.user, is_deleted=False).first()
+            if not store:
+                raise ValidationError("Store does not exist or is soft-deleted for this seller.")
             serializer.save(store=store)
-        except Store.DoesNotExist:
-            raise ValidationError("Store does not exist for this seller.")
-
+    
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """ Allows sellers to retrieve, update, or delete a specific product """
     serializer_class = ProductSerializer
@@ -49,6 +48,10 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Product.objects.filter(store__seller=self.request.user)
+    
+    def perform_destroy(self, instance):
+        instance.is_deleted = True   #soft deletion
+        instance.save()
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     """ Allows sellers to view and create product categories for their store """
@@ -59,11 +62,10 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         return Category.objects.filter(store__seller=self.request.user)
 
     def perform_create(self, serializer):
-        try:
-            store = Store.objects.get(seller=self.request.user)
+            store = Store.objects.filter(seller=self.request.user, is_deleted=False).first()
+            if not store:
+                raise ValidationError("Store does not exist or is soft-deleted for this seller.")
             serializer.save(store=store)
-        except Store.DoesNotExist:
-            raise ValidationError("Store does not exist for this seller.")
 
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     """ Allows sellers to retrieve, update, or delete a specific category """
@@ -72,3 +74,7 @@ class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Category.objects.filter(store__seller=self.request.user)
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True   #soft deletion
+        instance.save()

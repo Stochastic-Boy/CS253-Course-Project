@@ -11,11 +11,11 @@ def create_store(seller, name, description, location, status):
     )
 
 def get_all_stores():
-    return Store.objects.all()
+    return Store.objects.filter(is_deleted=False)
 
 def get_store_by_id(store_id):
     try:
-        return Store.objects.get(id=store_id)
+        return Store.objects.get(id=store_id, is_deleted=False)
     except ObjectDoesNotExist:
         return None
 
