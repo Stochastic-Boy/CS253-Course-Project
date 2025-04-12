@@ -1,1 +1,12 @@
 venv
+
+# Ignore Python cache
+_pycache_/
+**/_pycache_/
+*.py[cod]
+
+# Ignore all files inside migrations/ except _init_.py
+*/migrations/
+!/migrations/_init_.py
+
+.env
