@@ -154,7 +154,7 @@ class SendOTP(APIView):
         try:
             sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
             message = Mail(
-                from_email="campus.craves.iitk@gmail.com",
+                from_email="campuscravesmain@gmail.com",
                 to_emails=email,
                 subject=subject,
                 plain_text_content=body,
@@ -187,7 +187,7 @@ class SignupOTP(APIView):
             sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
             
             message = Mail(
-                from_email="campus.craves.iitk@gmail.com",
+                from_email="campuscravesmain@gmail.com",
                 to_emails=email,
                 subject=subject,
                 plain_text_content=body,
